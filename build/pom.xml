@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>atm</module>
-        <module>bank</module>
+        <module>atmapp</module>
+        <module>bankapp</module>
     </modules>
 
 </project>
