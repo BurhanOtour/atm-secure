@@ -8,5 +8,9 @@
     <artifactId>babyhack</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <modules>
+        <module>atm</module>
+        <module>bank</module>
+    </modules>
 
 </project>
