@@ -87,5 +87,7 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
+# Exclude .out files
+*.out
 
 # End of https://www.gitignore.io/api/maven,intellij+all
