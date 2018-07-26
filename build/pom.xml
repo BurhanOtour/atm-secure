@@ -17,6 +17,7 @@
     <modules>
         <module>atmapp</module>
         <module>bankapp</module>
+        <module>commons</module>
     </modules>
 
     <dependencies>
