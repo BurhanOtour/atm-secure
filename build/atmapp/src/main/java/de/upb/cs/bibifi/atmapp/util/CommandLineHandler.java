@@ -5,7 +5,7 @@ import org.apache.commons.cli.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
+import de.upd.cd.bibifi.commons.Validator;
 
 public class CommandLineHandler {
 
@@ -69,25 +69,26 @@ public class CommandLineHandler {
      * @param cmdLine
      */
     private void processCommandLineArguments(CommandLine cmdLine) {
+        Validator validator = new Validator();
         Set<String> options = new HashSet<>();
         Arrays.stream(cmdLine.getOptions()).forEach(option -> {
             if (!checkDuplicates(option.getOpt(), options)) fail();
             if (CMD_D.equals(option.getOpt()) || CMD_W.equals(option.getOpt()) || CMD_N.equals(option.getOpt()))
-                if (!validateNumerals(option.getValue())) fail();
+                if (!validator.validateNumerals(option.getValue())) fail();
             if (CMD_I.equals(option.getOpt())) {
-                if (!validateIP(option.getValue()))
+                if (!validator.validateIP(option.getValue()))
                     fail();
             }
             if (CMD_P.equals(option.getOpt())) {
-                if (!validatePort(option.getValue()))
+                if (!validator.validatePort(option.getValue()))
                     fail();
             }
             if (CMD_C.equals(option.getOpt())|| CMD_S.equals(option.getOpt())) {
-                if (!validateFileName(option.getValue()))
+                if (!validator.validateFileName(option.getValue()))
                     fail();
             }
             if (CMD_A.equals(option.getOpt()) ) {
-                if (!validateAcountName(option.getValue()))
+                if (!validator.validateAcountName(option.getValue()))
                     fail();
             }
         });
@@ -110,71 +111,5 @@ public class CommandLineHandler {
     private void fail() {
         System.out.print("255");
         System.exit(1);
-    }
-
-    /**
-     * Check regex validation for numeric value
-     *
-     * @param numeral
-     * @return
-     */
-    private boolean validateNumerals(String numeral) {
-        double max_amount = 4294967295.99;
-        double amount = Double.valueOf(numeral);
-        Pattern pattern = Pattern.compile("^(0|[1-9][0-9]*)\\.\\d{2}$");
-        return numeral.matches(pattern.pattern()) ? amount < max_amount : false;
-    }
-
-    /**
-     * Check regex validation for IP address
-     *
-     * @param ipString
-     * @return
-     */
-    private boolean validateIP(String ipString) {
-        //Pattern pattern = Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
-        Pattern pattern = Pattern.compile(
-                "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
-        return pattern.matcher(ipString).matches();
-    }
-
-    /**
-     * Check regex validation for port
-     *
-     * @param portString
-     * @return
-     */
-    private boolean validatePort(String portString) {
-        int min_num = 1024;
-        int max_num = 65535;
-        int amount = Integer.valueOf(portString);
-        Pattern pattern = Pattern.compile("^(102[4-9]|10[3-9][0-9]|1[1-9][0-9]{2}|[2-9][0-9]{3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
-        boolean b = false;
-        if (amount > min_num && amount < max_num) {
-            b = portString.matches(pattern.pattern());
-        }
-        return b;
-    }
-
-    /**
-     * Check regex validation for File names
-     *
-     * @param fileName
-     * @return
-     */
-    private boolean validateFileName(String fileName) {
-        Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+[^.][^-][^_]|[^_][^-][^.][_\\-\\.0-9a-z]+|[_\\-\\.0-9a-z][^-][^_][^.][_\\-\\.0-9a-z]$");
-        return fileName.length() < 128 ? pattern.matcher(fileName).matches() : false;
-    }
-
-    /**
-     * Check regex validation for File names
-     *
-     * @param acountName
-     * @return
-     */
-    private boolean validateAcountName(String acountName) {
-        Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
-        return acountName.length() < 123 ? pattern.matcher(acountName).matches() : false;
     }
 }
