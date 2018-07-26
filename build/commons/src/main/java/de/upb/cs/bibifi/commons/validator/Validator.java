@@ -1,11 +1,23 @@
-package de.upd.cd.bibifi.commons;
+package de.upb.cs.bibifi.commons.validator;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Validator {
 
     public Validator() {
+    }
 
+    /**
+     * check if arguments are duplicated
+     *
+     * @param option
+     * @param options
+     * @return
+     */
+    public boolean checkDuplicates(String option, Set<String> options) {
+        return options.add(option);
     }
 
     /**
@@ -17,7 +29,7 @@ public class Validator {
     public boolean validateNumerals(String numeral) {
         double max_amount = 4294967295.99;
         double amount = Double.valueOf(numeral);
-        Pattern pattern = Pattern.compile("^(0|[1-9][0-9]*)\\.\\d{2}$");
+        Pattern pattern = Pattern.compile("^(0|[1-9][0-9]*)\\.\\d{2}|([1-9][0-9]*)$");
         return numeral.matches(pattern.pattern()) ? amount < max_amount : false;
     }
 
@@ -59,18 +71,58 @@ public class Validator {
      * @return
      */
     public boolean validateFileName(String fileName) {
-        Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+[^.][^-][^_]|[^_][^-][^.][_\\-\\.0-9a-z]+|[_\\-\\.0-9a-z][^-][^_][^.][_\\-\\.0-9a-z]$");
+        Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+[^.]|[^.][_\\-\\.0-9a-z]+|[_\\-\\.0-9a-z][^.][_\\-\\.0-9a-z]$");
         return fileName.length() < 128 ? pattern.matcher(fileName).matches() : false;
     }
 
     /**
      * Check regex validation for File names
      *
-     * @param acountName
+     * @param accountName
      * @return
      */
-    public boolean validateAcountName(String acountName) {
+    public boolean validateAccountName(String accountName) {
         Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
-        return acountName.length() < 123 ? pattern.matcher(acountName).matches() : false;
+        return accountName.length() < 123 ? pattern.matcher(accountName).matches() : false;
+    }
+
+    /**
+     * Check regex validation for File names
+     *
+     * @param initialBalance
+     * @return
+     */
+    public boolean validateInitialBalance(String initialBalance) {
+        int amount = Integer.valueOf(initialBalance);
+        return amount > 10 ? true : false;
+    }
+
+    /**
+     * check if arguments contain more than one Operations
+     *
+     * @param options
+     * @return
+     */
+    public boolean checkOperations(Set<String> options) {
+
+        final String CMD_D = "d";
+        final String CMD_W = "w";
+        final String CMD_N = "n";
+        final String CMD_G = "g";
+
+        Set<String> operations = new HashSet<>();
+        operations.add(CMD_D);
+        operations.add(CMD_W);
+        operations.add(CMD_N);
+        operations.add(CMD_G);
+        boolean match = false;
+        for (String s : options) {
+            if (operations.contains(s) && match != true) {
+                match = true;
+            }else if (operations.contains(s) && match == true){
+                match = false;
+            }
+        }
+        return match;
     }
 }
