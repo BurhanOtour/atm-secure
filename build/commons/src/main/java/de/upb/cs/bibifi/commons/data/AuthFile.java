@@ -1,4 +1,4 @@
-package de.upd.cd.bibifi.commons.data;
+package de.upb.cs.bibifi.commons.data;
 
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;

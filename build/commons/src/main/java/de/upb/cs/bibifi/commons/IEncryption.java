@@ -1,4 +1,4 @@
-package de.upd.cd.bibifi.commons;
+package de.upb.cs.bibifi.commons;
 
 import java.io.IOException;
 import java.io.InputStream;
