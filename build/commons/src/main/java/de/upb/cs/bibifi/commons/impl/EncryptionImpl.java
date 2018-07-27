@@ -1,4 +1,4 @@
-package de.upd.cd.bibifi.commons.impl;
+package de.upb.cs.bibifi.commons.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import de.upd.cd.bibifi.commons.IEncryption;
+import de.upb.cs.bibifi.commons.IEncryption;
 
 
 public class EncryptionImpl implements IEncryption {

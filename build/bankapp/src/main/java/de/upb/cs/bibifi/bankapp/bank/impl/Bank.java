@@ -5,7 +5,7 @@ import de.upb.cs.bibifi.bankapp.bank.IAuthFileContentGenerator;
 import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.bankapp.constants.AppConstants;
 import de.upb.cs.bibifi.bankapp.data.Account;
-import de.upd.cd.bibifi.commons.data.AuthFile;
+import de.upb.cs.bibifi.commons.data.AuthFile;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 

@@ -1,6 +1,6 @@
 package de.upd.cd.bibifi.commons;
 
-import de.upd.cd.bibifi.commons.impl.EncryptionImpl;
+import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 
 import org.junit.Test;
 
