@@ -51,7 +51,14 @@ public class Bank implements IBank {
      * @return if the account creation protocol is respected it should return the pin back
      */
     @Override
-    public String createBalance(String acc, int balance) {
+    public String createBalance(String acc, int balance) throws Exception {
+        Account account = accounts.get(acc);
+        if (account != null) {
+            throw new Exception("Account Already Exists");
+        }
+        if (balance < 10) {
+            throw new Exception("Balance is less than 10.00");
+        }
         String generatedPin = generatePIN();
         accounts.put(acc, new Account(balance, acc, hashMessage(generatedPin + getSalt())));
         return generatedPin;

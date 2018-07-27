@@ -64,4 +64,16 @@ class BankTest {
         Matcher m = p.matcher(pin1);
         assertTrue(m.find());
     }
+
+    @Test
+    void notTwoAccountShouldHaveTheSameKeyTest() throws Exception {
+        final String key = "key";
+        IBank bank = Bank.getBank();
+        bank.createBalance(key, 103);
+        try {
+            bank.createBalance(key, 103);
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
 }
