@@ -14,6 +14,17 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
+    <repositories>
+        <repository>
+            <id>repo</id>
+            <name>repo</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <url>file://../common/repository</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>

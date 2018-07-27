@@ -67,4 +67,16 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>repo</id>
+            <name>repo</name>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+            <url>file://../../common/repository</url>
+        </repository>
+    </repositories>
+
 </project>

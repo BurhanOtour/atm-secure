@@ -20,6 +20,17 @@
         <module>commons</module>
     </modules>
 
+    <repositories>
+    <repository>
+        <id>repo</id>
+        <name>repo</name>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <url>file://../../common/repository</url>
+    </repository>
+    </repositories>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
         <dependency>
