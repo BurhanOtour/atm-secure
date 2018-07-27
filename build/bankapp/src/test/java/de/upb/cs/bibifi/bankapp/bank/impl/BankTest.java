@@ -43,7 +43,7 @@ class BankTest {
     }
 
     @Test
-    void twoMessagesResultInTheSameHashTest() {
+    void twoMessagesResultInTheSameHashTest() throws IOException {
         String message1 = "Hello Wolrd!";
         String message2 = "Hello Wolrd!";
         Bank bank = (Bank) Bank.getBank();
