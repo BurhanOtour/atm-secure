@@ -5,10 +5,12 @@ import de.upb.cs.bibifi.bankapp.bank.IAuthFileContentGenerator;
 import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.bankapp.constants.AppConstants;
 import de.upb.cs.bibifi.bankapp.data.Account;
+import de.upd.cd.bibifi.commons.data.AuthFile;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Bank implements IBank {
@@ -92,13 +94,14 @@ public class Bank implements IBank {
         return account.getBalance();
     }
 
-    public String hashMessage(String message) {
+    public String hashMessage(String message) throws IOException {
         return DigestUtils.sha1Hex(message + getSalt());
     }
 
     private void createAuthFile(String authFileName) throws Exception {
         // @TODO the one should be replaced by the read generator
-        IAuthFileContentGenerator generator = DummyAuthFileContentGenerator.getGenerator();
+        // @TODO this could be moved later to Server
+        IAuthFileContentGenerator generator = AuthFileContentGeneratorImpl.getGenerator();
         File authFile = new File(authFileName);
         FileUtils.copyInputStreamToFile(generator.generateAuthFileContent(), authFile);
     }
@@ -109,11 +112,11 @@ public class Bank implements IBank {
         return String.valueOf(randomPIN);
     }
 
-    private String getSalt() {
-        return "SomeSalt";
+    private String getSalt() throws IOException {
+        return AuthFile.getAuthFile(this.authFile).getSalt();
     }
 
-    private Account validateAccountData(String acc, String pin) {
+    private Account validateAccountData(String acc, String pin) throws IOException {
         Account account = accounts.get(acc);
         if (account == null || !account.getHashedPin().equals(hashMessage(pin + getSalt()))) {
             return null;
