@@ -1,11 +1,13 @@
 package de.upb.cs.bibifi.atmapp.util;
 
+import de.upb.cs.bibifi.atmapp.atm.impl.Atm;
+import de.upb.cs.bibifi.commons.validator.Validator;
 import org.apache.commons.cli.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import de.upd.cd.bibifi.commons.Validator;
+
 
 public class CommandLineHandler {
 
@@ -48,7 +50,6 @@ public class CommandLineHandler {
         options.addOption(CMD_N, "initial", true, "initial balance");
         options.addOption(CMD_G, "initial balance");
 
-
         CommandLine commandLine = null;
 
         try {
@@ -69,40 +70,61 @@ public class CommandLineHandler {
      * @param cmdLine
      */
     private void processCommandLineArguments(CommandLine cmdLine) {
-        Validator validator = new Validator();
-        Set<String> options = new HashSet<>();
+
+        Atm atm = new Atm();
+
         Arrays.stream(cmdLine.getOptions()).forEach(option -> {
-            if (!checkDuplicates(option.getOpt(), options)) fail();
-            if (CMD_D.equals(option.getOpt()) || CMD_W.equals(option.getOpt()) || CMD_N.equals(option.getOpt()))
-                if (!validator.validateNumerals(option.getValue())) fail();
-            if (CMD_I.equals(option.getOpt())) {
-                if (!validator.validateIP(option.getValue()))
-                    fail();
-            }
-            if (CMD_P.equals(option.getOpt())) {
-                if (!validator.validatePort(option.getValue()))
-                    fail();
-            }
-            if (CMD_C.equals(option.getOpt())|| CMD_S.equals(option.getOpt())) {
-                if (!validator.validateFileName(option.getValue()))
-                    fail();
-            }
-            if (CMD_A.equals(option.getOpt()) ) {
-                if (!validator.validateAcountName(option.getValue()))
-                    fail();
+
+            switch (option.getOpt()) {
+                case CMD_N:
+                    applyValidators(cmdLine.getOptions());
+                    atm.createAccount(cmdLine.getOptions());
+                case CMD_D:
+                    applyValidators(cmdLine.getOptions());
+                    atm.deposit(cmdLine.getOptions());
+                case CMD_W:
+                    applyValidators(cmdLine.getOptions());
+                    atm.withdraw(cmdLine.getOptions());
             }
         });
     }
 
     /**
-     * check if arguments are duplicated
+     * Apply set of validators to all input parameters
      *
-     * @param option
      * @param options
      * @return
      */
-    private boolean checkDuplicates(String option, Set<String> options) {
-        return options.add(option);
+    private void applyValidators(Option[] options) {
+
+        Validator validator = new Validator();
+
+        Set<String> duplicateOptionsSet = new HashSet<>();
+
+        Arrays.stream(options).forEach(option -> {
+
+            if (!validator.checkDuplicates(option.getOpt(), duplicateOptionsSet)) fail();
+
+            switch (option.getOpt()) {
+                case CMD_N:
+                case CMD_D:
+                case CMD_W:
+                    if (!validator.validateNumerals(option.getValue()))
+                        fail();
+                case CMD_I:
+                    if (!validator.validateIP(option.getValue()))
+                        fail();
+                case CMD_P:
+                    if (!validator.validatePort(option.getValue()))
+                        fail();
+                case CMD_C:
+                    if (!validator.validateFileName(option.getValue()))
+                        fail();
+                case CMD_A:
+                    if (!validator.validateAccountName((option.getValue()))) ;
+                    fail();
+            }
+        });
     }
 
     /**
