@@ -1,35 +1,57 @@
 package de.upb.cs.bibifi.atmapp;
 
+import de.upb.cs.bibifi.commons.ITransmissionPacketProcessor;
+import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import de.upb.cs.bibifi.commons.impl.TransmissionPacketProcessor;
+import de.upb.cs.bibifi.commons.impl.Utilities;
+
 import java.io.*;
 import java.net.Socket;
 
 public class Client implements IClient {
+
     private String ipAddress = null;
+
     private int port = 0;
 
-    public Client (String ip, int port){
+    public Client(String ip, int port) {
         ipAddress = ip;
         this.port = port;
     }
 
-    @Override
-    public String clientRequest(String msg) throws IOException {
-        Socket sock = new Socket(ipAddress, 25000);
-        BufferedReader keyRead = new BufferedReader(new InputStreamReader(System.in));
-        OutputStream ostream = sock.getOutputStream();
-        PrintWriter pwrite = new PrintWriter(ostream, true);
-        InputStream istream = sock.getInputStream();
-        BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+    private TransmissionPacket processResponse(String response) {
+        return Utilities.deserializer(response);
+    }
 
-        String receiveMessage, sendMessage;
-        while (true) {
-            sendMessage = msg;
-            pwrite.println(sendMessage);
-            pwrite.flush();
-            if ((receiveMessage = receiveRead.readLine()) != null) {
-                sock.close();
-                return receiveMessage;
-            }
-        }
+    @Override
+    public TransmissionPacket clientRequest(TransmissionPacket request) throws IOException {
+
+        ITransmissionPacketProcessor packetProcessor = TransmissionPacketProcessor.getTransmissionPacketProcessor();
+
+        OutputStream outPacket = packetProcessor.encryptMessage(request);
+
+        Socket sock = new Socket(ipAddress, 25000);
+
+        BufferedReader keyRead = new BufferedReader(new InputStreamReader(System.in));
+
+        OutputStream outputStream = sock.getOutputStream();
+
+        PrintWriter printWriter = new PrintWriter(outputStream, true);
+
+        InputStream inputStream = sock.getInputStream();
+
+        BufferedReader receiveRead = new BufferedReader(new InputStreamReader(inputStream));
+
+        printWriter.println(outPacket);
+
+        printWriter.flush();
+
+        String response = receiveRead.readLine();
+
+        System.out.println("Hey I am coming from server: " + response);
+
+        sock.close();
+
+        return processResponse(response);
     }
 }

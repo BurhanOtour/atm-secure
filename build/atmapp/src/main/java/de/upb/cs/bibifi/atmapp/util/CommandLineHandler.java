@@ -1,5 +1,6 @@
 package de.upb.cs.bibifi.atmapp.util;
 
+import de.upb.cs.bibifi.atmapp.Client;
 import de.upb.cs.bibifi.atmapp.atm.impl.Atm;
 import de.upb.cs.bibifi.commons.validator.Validator;
 import org.apache.commons.cli.*;
@@ -21,6 +22,8 @@ public class CommandLineHandler {
     private static final String CMD_P = "p";
     private static final String CMD_G = "g";
 
+    private Atm atm = null;
+
 
     private String[] args = null;
 
@@ -29,31 +32,41 @@ public class CommandLineHandler {
     }
 
     /**
-     * Initialize commandline set-up
+     * Initialize Atm and validate parameters
      */
     public void init() {
+
         CommandLineParser commandLineParser = new DefaultParser();
 
         HelpFormatter formatter = new HelpFormatter();
 
         Options options = new Options();
 
-        Option option = new Option(CMD_A, "initial", true, "initial acount");
-        option.setRequired(true);
-        options.addOption(option);
+        options.addOption(CMD_A, "initial", true, "initial acount");
         options.addOption(CMD_S, "auth", true, "authentication file");
         options.addOption(CMD_C, "card", true, "user's bank card");
         options.addOption(CMD_D, "deposit", true, "deposit amount");
         options.addOption(CMD_W, "withdrawal", true, "withdrawal amount");
-        options.addOption(CMD_I, "initial ip", true, "initial ip");
-        options.addOption(CMD_P, "initial port", true, "initial port");
+        options.addOption(CMD_I, "ip", true, "initial ip");
+        options.addOption(CMD_P, "port", true, "initial port");
         options.addOption(CMD_N, "initial", true, "initial balance");
-        options.addOption(CMD_G, "initial balance");
+        options.addOption(CMD_G, "checkbalance");
 
         CommandLine commandLine = null;
 
         try {
+
             commandLine = commandLineParser.parse(options, args);
+
+            //validate all commandline parameters
+            applyValidators(commandLine.getOptions());
+
+            //ip, port and their default values
+            String ip = commandLine.getOptionValue("ip", "127.0.0.1");
+            Integer port = Integer.parseInt(commandLine.getOptionValue("port", "25001"));
+
+            this.atm = new Atm(new Client(ip, port));
+
         } catch (ParseException e) {
             e.printStackTrace();
             System.out.println("255");
@@ -65,25 +78,20 @@ public class CommandLineHandler {
     }
 
     /**
-     * Process command line arguments based on given rules
+     * Call businesslogic methods based on input parameters
      *
      * @param cmdLine
      */
     private void processCommandLineArguments(CommandLine cmdLine) {
 
-        Atm atm = new Atm();
-
         Arrays.stream(cmdLine.getOptions()).forEach(option -> {
 
             switch (option.getOpt()) {
                 case CMD_N:
-                    applyValidators(cmdLine.getOptions());
                     atm.createAccount(cmdLine.getOptions());
                 case CMD_D:
-                    applyValidators(cmdLine.getOptions());
                     atm.deposit(cmdLine.getOptions());
                 case CMD_W:
-                    applyValidators(cmdLine.getOptions());
                     atm.withdraw(cmdLine.getOptions());
             }
         });
@@ -111,18 +119,25 @@ public class CommandLineHandler {
                 case CMD_W:
                     if (!validator.validateNumerals(option.getValue()))
                         fail();
+                    break;
                 case CMD_I:
                     if (!validator.validateIP(option.getValue()))
                         fail();
+                    break;
                 case CMD_P:
                     if (!validator.validatePort(option.getValue()))
                         fail();
+                    break;
                 case CMD_C:
                     if (!validator.validateFileName(option.getValue()))
                         fail();
+                    break;
                 case CMD_A:
-                    if (!validator.validateAccountName((option.getValue()))) ;
-                    fail();
+                    if (!validator.validateAccountName((option.getValue())))
+                        fail();
+                    break;
+                default:
+                    break;
             }
         });
     }
