@@ -73,10 +73,21 @@
             <name>repo</name>
             <releases>
                 <enabled>true</enabled>
-                <checksumPolicy>ignore</checksumPolicy>
             </releases>
-            <url>file://../../common/repository</url>
+            <url>file://${basedir}/../common/repository</url>
         </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>plugrepo</id>
+            <name>plugrepo</name>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+            <url>file://${basedir}/../common/repository</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
