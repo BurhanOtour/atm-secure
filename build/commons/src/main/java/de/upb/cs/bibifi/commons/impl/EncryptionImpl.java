@@ -1,9 +1,6 @@
 package de.upb.cs.bibifi.commons.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -23,8 +20,22 @@ public class EncryptionImpl implements IEncryption {
 
 	private byte[] key;
 
-	public EncryptionImpl(String key){
-		this.key = key.getBytes();
+	private static EncryptionImpl singleton;
+
+	private EncryptionImpl(){}
+
+	public static EncryptionImpl Initialize(String key){
+		if(singleton == null)
+			singleton = new EncryptionImpl();
+
+		singleton.key = key.getBytes();
+		return singleton;
+	}
+
+	public static EncryptionImpl getInstance() throws Exception {
+			if(singleton == null)
+				throw new Exception("Encryption is not initialized");
+		return  singleton;
 	}
 
     public OutputStream encryptMessage(String message) throws IOException{
@@ -41,7 +52,7 @@ public class EncryptionImpl implements IEncryption {
 			throw new IOException("Error happened with encryption the message");
 		}
     }
-    
+
     public String decryptMessage(InputStream inputStream) throws IOException {
 		try {
 			byte[] encryptedArray = readBytes(inputStream);

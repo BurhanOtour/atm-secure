@@ -1,8 +1,8 @@
 package de.upb.cs.bibifi.commons;
 
-import de.upb.cs.bibifi.commons.IEncryption;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 
+import de.upb.cs.bibifi.commons.impl.Utilities;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,13 +18,17 @@ public class EncryptionTest {
     public void EncryptionTest() throws Exception{
         String helloMessage = "Hello encryption";
         String key = "1234567891012141";
-        IEncryption encryption = new EncryptionImpl(new String(key));
+        IEncryption encryption = EncryptionImpl.Initialize(key);
 
         OutputStream outStreamEnc = encryption.encryptMessage(helloMessage);
         InputStream inputStreamDec = new ByteArrayInputStream(((ByteArrayOutputStream) outStreamEnc).toByteArray());
 
         String decodedString = encryption.decryptMessage(inputStreamDec);
 
+        String encryptedString = Utilities.ConvertOutputStream(encryption.encryptMessage(helloMessage));
+        String decryptedString = encryption.decryptMessage(Utilities.CovertString(encryptedString));
+
+        assertEquals(helloMessage, decryptedString);
         assertEquals(helloMessage, decodedString);
     }
 }
