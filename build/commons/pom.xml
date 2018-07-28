@@ -75,7 +75,7 @@
                 <enabled>true</enabled>
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
-            <url>file://../../common/repository</url>
+            <url>file://../common/repository</url>
         </repository>
     </repositories>
 
