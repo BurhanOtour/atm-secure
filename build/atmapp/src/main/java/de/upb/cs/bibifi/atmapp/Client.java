@@ -1,7 +1,9 @@
 package de.upb.cs.bibifi.atmapp;
 
 import de.upb.cs.bibifi.commons.ITransmissionPacketProcessor;
+import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.TransmissionPacketProcessor;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 
@@ -17,6 +19,11 @@ public class Client implements IClient {
     public Client(String ip, int port) {
         ipAddress = ip;
         this.port = port;
+
+        // TODO: 28/07/2018 find better way to do it
+        AuthFile authFile = AuthFile.getAuthFile("/Users/sajjadpervaiz/git/uni/BabyHack/build/bank-2.auth");
+        EncryptionImpl.initialize(authFile.getKey());
+
     }
 
     private TransmissionPacket processResponse(String response) {
@@ -24,7 +31,7 @@ public class Client implements IClient {
     }
 
     @Override
-    public TransmissionPacket clientRequest(TransmissionPacket request) throws IOException {
+    public TransmissionPacket clientRequest(TransmissionPacket request) throws Exception {
 
         ITransmissionPacketProcessor packetProcessor = TransmissionPacketProcessor.getTransmissionPacketProcessor();
 

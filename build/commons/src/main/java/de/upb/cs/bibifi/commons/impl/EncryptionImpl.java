@@ -20,8 +20,8 @@ public class EncryptionImpl implements IEncryption {
 
     private static String algoName = "AES";
 
-    private static String transformation = "AES/CBC/PKCS5Padding";
-
+//    private static String transformation = "AES/CBC/PKCS5Padding";
+    private static String transformation = "AES/ECB/NoPadding";
     private byte[] key;
 
     private static EncryptionImpl singleton;
@@ -68,13 +68,13 @@ public class EncryptionImpl implements IEncryption {
             return new String(decryptedBytes);
         } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | BadPaddingException |
                 InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException ex) {
-            throw new IOException("Error happened with decryption the message");
+            throw new IOException("Error happened with decryption the message", ex);
         }
     }
 
-    private byte[] readBytes(InputStream inputStream) throws IOException {
+    public static byte[] readBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        byte[] buffer = new byte[0xFFFF];
+        byte[] buffer = new byte[1];
         for (int len = inputStream.read(buffer); len != -1; len = inputStream.read(buffer)) {
             os.write(buffer, 0, len);
         }

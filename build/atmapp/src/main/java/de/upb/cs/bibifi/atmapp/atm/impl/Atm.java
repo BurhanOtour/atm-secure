@@ -50,7 +50,7 @@ public class Atm implements IATM {
                     .stream()
                     .forEach(System.out::println);// TODO: 27/07/2018 print what is needed only
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -28,10 +28,6 @@ public class ServerProcessor implements IServerProcessor {
         return processor;
     }
 
-    private String processRequest(String requestBody) throws Exception {
-        TransmissionPacket transmissionPacket = Utilities.deserializer(requestBody);
-        return executeOperation(transmissionPacket);
-    }
 
     private TransmissionPacket createAccountPacket(String accountName, Integer balance, String pin, Status status) {
         TransmissionPacket packet = new TransmissionPacket();

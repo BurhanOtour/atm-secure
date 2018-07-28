@@ -13,15 +13,17 @@ public class TransmissionPacketProcessor implements ITransmissionPacketProcessor
     private final IEncryption encryption;
     private static ITransmissionPacketProcessor processor = null;
 
-    private TransmissionPacketProcessor() {
-        this.encryption = null; // Get Singlton Instance
+    private TransmissionPacketProcessor() throws Exception {
+        this.encryption = EncryptionImpl.getInstance(); // Get Singlton Instance
     }
 
-    public static ITransmissionPacketProcessor getTransmissionPacketProcessor() {
+    public static ITransmissionPacketProcessor getTransmissionPacketProcessor() throws Exception {
         if (processor != null)
             return processor;
 
-        processor = new TransmissionPacketProcessor();
+        else
+            processor = new TransmissionPacketProcessor();
+
         return processor;
     }
 

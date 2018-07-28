@@ -12,6 +12,7 @@ import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 
 public class Server implements IServer {
@@ -47,6 +48,7 @@ public class Server implements IServer {
         Bank.getBank().startup(authFile);
         encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
     }
+
 
     @Override
     public void start() throws Exception {
