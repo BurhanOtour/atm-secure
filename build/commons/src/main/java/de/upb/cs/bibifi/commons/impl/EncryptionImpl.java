@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -31,7 +32,7 @@ public class EncryptionImpl implements IEncryption {
         if (singleton == null)
             singleton = new EncryptionImpl();
 
-        singleton.key = key.getBytes();
+        singleton.key = key.getBytes(StandardCharsets.ISO_8859_1);
         return singleton;
     }
 
