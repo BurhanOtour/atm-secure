@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        Gson g = new Gson();
+        /*Gson g = new Gson();
         Account acc = new Account(130,"Burhan","12312412edaskfbasdkdfhsab");
         String json = g.toJson(acc);
         Account deserializedAccount = g.fromJson(new InputStreamReader(new ByteArrayInputStream(json.getBytes())), Account.class);
@@ -19,6 +19,7 @@ public class Main {
         System.out.println("------------------------");
         IBank bank = Bank.getBank();
 
-        bank.startup("bank.auth");
+        bank.startup("bank.auth");*/
+
     }
 }
