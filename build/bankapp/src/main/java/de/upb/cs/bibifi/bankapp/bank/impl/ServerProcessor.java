@@ -1,24 +1,28 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
-import de.upb.cs.bibifi.bankapp.bank.IBank;
+import com.google.gson.Gson;
 import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
-import de.upb.cs.bibifi.commons.ITransmissionPacketProcessor;
+import de.upb.cs.bibifi.commons.dto.CreationResponse;
+import de.upb.cs.bibifi.commons.dto.Response;
 import de.upb.cs.bibifi.commons.dto.Status;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.enums.RequestType;
-import de.upb.cs.bibifi.commons.enums.StatusCode;
-import de.upb.cs.bibifi.commons.impl.TransmissionPacketProcessor;
 import de.upb.cs.bibifi.commons.impl.Utilities;
+import org.json.JSONObject;
+
+import static de.upb.cs.bibifi.bankapp.constants.AppConstants.*;
 
 public class ServerProcessor implements IServerProcessor {
 
     private static ServerProcessor processor;
 
-    private ServerProcessor (){
+    private Gson gson = new Gson();
+
+    private ServerProcessor() {
 
     }
 
-    public static ServerProcessor getServerProcessor (){
+    public static ServerProcessor getServerProcessor() {
         if (processor == null)
             processor = new ServerProcessor();
         return processor;
@@ -29,7 +33,7 @@ public class ServerProcessor implements IServerProcessor {
         return executeOperation(transmissionPacket);
     }
 
-    private TransmissionPacket createAccountPacket (String accountName, Integer balance, String pin, Status status){
+    private TransmissionPacket createAccountPacket(String accountName, Integer balance, String pin, Status status) {
         TransmissionPacket packet = new TransmissionPacket();
         packet.setProperty("pin", pin);
         packet.setProperty("balance", balance.toString());
@@ -39,25 +43,116 @@ public class ServerProcessor implements IServerProcessor {
         return packet;
     }
 
-    public String executeOperation(TransmissionPacket transmissionPacket) throws Exception {
+    // Validate TransmissionPacket before injecting it here!
+    public String executeOperation(TransmissionPacket transmissionPacket) {
+        String output = null;
+        switch (transmissionPacket.getRequestType()) {
+            case CREATE:
+                output = createAccount(transmissionPacket);
+                break;
+            case DEPOSIT:
+                output = deposit(transmissionPacket);
+                break;
+            case WITHDRAW:
+                output = withdraw(transmissionPacket);
+                break;
+            case CHECKBALANCE:
+                output = checkBalance(transmissionPacket);
+                break;
 
-        IBank bank = Bank.getBank();
-        ITransmissionPacketProcessor processor = TransmissionPacketProcessor.getTransmissionPacketProcessor();
-
-        if (transmissionPacket.getRequestType() == RequestType.CREATE) {
-            String accountName = transmissionPacket.getProperty("accountName");
-            Integer balance = Integer.parseInt(transmissionPacket.getProperty("initialBalance"));
-            String pin = bank.createBalance(accountName, balance);
-
-            //Check Burhan
-            Status code = new Status();
-            code.setStatusCode(StatusCode.OK);
-            code.setMessage("");
-            TransmissionPacket packet = createAccountPacket (accountName, balance, pin, code);
-            //processor.encryptMessage(packet);
-            // change it to string encryption
-            return Utilities.Serializer(packet);
         }
-        return "";
+        return output;
+
+    }
+
+    // @TODO Store hard coded String into constants
+    private String createAccount(TransmissionPacket transmissionPacket) {
+        String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
+        Integer balance = Integer.parseInt(transmissionPacket.getProperty(KEY_BALANCE));
+        String pin = Bank.getBank().createBalance(accountName, balance);
+        Response response;
+        if (pin == null) {
+            response = new Response("", 255);
+        } else {
+            response = buildResponse(RequestType.CREATE, transmissionPacket, pin);
+        }
+        return gson.toJson(response);
+    }
+
+    private String deposit(TransmissionPacket transmissionPacket) {
+        String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
+        Integer balance = Integer.parseInt(transmissionPacket.getProperty(KEY_DEPOSITE));
+        String pin = transmissionPacket.getProperty(KEY_PIN);
+        boolean success = Bank.getBank().deposit(accountName, pin, balance);
+        Response response;
+        if (success) {
+            response = buildResponse(RequestType.DEPOSIT, transmissionPacket, null);
+        } else {
+            response = new Response("", 255);
+        }
+        return gson.toJson(response);
+    }
+
+    private String checkBalance(TransmissionPacket transmissionPacket) {
+        String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
+        String pin = transmissionPacket.getProperty(KEY_PIN);
+        int balance = Bank.getBank().checkBalance(accountName, pin);
+        Response response;
+        if (balance > -1) {
+            response = buildResponse(RequestType.DEPOSIT, transmissionPacket, null);
+        } else {
+            response = new Response("", 255);
+        }
+        return gson.toJson(response);
+    }
+
+    private String withdraw(TransmissionPacket transmissionPacket) {
+        String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
+        Integer balance = Integer.parseInt(transmissionPacket.getProperty(KEY_WIHTDRAW));
+        String pin = transmissionPacket.getProperty(KEY_PIN);
+        boolean success = Bank.getBank().withdraw(accountName, pin, balance);
+        Response response;
+        if (success) {
+            JSONObject obj = new JSONObject();
+            obj.put(KEY_ACCOUNT_NAME, accountName);
+            obj.put(KEY_WIHTDRAW, balance);
+            response = buildResponse(RequestType.WITHDRAW, transmissionPacket, null);
+        } else {
+            response = new Response("", 255);
+        }
+        return gson.toJson(response);
+    }
+
+    private Response buildResponse(RequestType type, TransmissionPacket transmissionPacket, String data) {
+        Response response = null;
+        JSONObject obj = new JSONObject();
+        String message;
+        switch (type) {
+            case CREATE:
+                obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
+                obj.put(KEY_INITIAL_BALANCE, transmissionPacket.getProperty(KEY_INITIAL_BALANCE));
+                message = obj.toString();
+                response = new CreationResponse(message, 0, data);
+                break;
+            case DEPOSIT:
+                obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
+                obj.put(KEY_DEPOSITE, transmissionPacket.getProperty(KEY_DEPOSITE));
+                message = obj.toString();
+                response = new Response(message, 0);
+                break;
+            case WITHDRAW:
+                obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
+                obj.put(KEY_WIHTDRAW, transmissionPacket.getProperty(KEY_WIHTDRAW));
+                message = obj.toString();
+                response = new Response(message, 0);
+                break;
+            case CHECKBALANCE:
+                obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
+                obj.put(KEY_BALANCE, new Integer(data));
+                message = obj.toString();
+                response = new Response(message, 0);
+                break;
+        }
+        return response;
     }
 }
