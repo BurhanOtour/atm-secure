@@ -7,7 +7,6 @@ import de.upb.cs.bibifi.bankapp.constants.AppConstants;
 import de.upb.cs.bibifi.bankapp.data.Account;
 import de.upb.cs.bibifi.bankapp.exceptions.SystemException;
 import de.upb.cs.bibifi.commons.data.AuthFile;
-import de.upb.cs.bibifi.commons.dto.Request;
 import de.upb.cs.bibifi.commons.enums.RequestType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -47,13 +46,14 @@ public class Bank implements IBank {
 
     @Override
     public void startup(String authFileName) throws Exception {
-        // @TODO check auth file name validity
+//        // @TODO check auth file name validity
         this.authFile = authFileName == null || authFileName.isEmpty() ? AppConstants.DEFAULT_AUTH_FILE_NAME : authFileName;
         if ((new File(this.authFile)).exists()) {
             throw new IllegalStateException("Auth file already exists");
         }
         createAuthFile(this.authFile);
         System.out.println(AppConstants.BANK_CREATION_CONFIRMATION_MESSAGE);
+        //this.authFile = authFileName;
     }
 
     /**

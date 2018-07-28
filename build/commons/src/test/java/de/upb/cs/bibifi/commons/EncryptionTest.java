@@ -18,15 +18,15 @@ public class EncryptionTest {
     public void EncryptionTest() throws Exception{
         String helloMessage = "Hello encryption";
         String key = "1234567891012141";
-        IEncryption encryption = EncryptionImpl.Initialize(key);
+        IEncryption encryption = EncryptionImpl.initialize(key);
 
         OutputStream outStreamEnc = encryption.encryptMessage(helloMessage);
         InputStream inputStreamDec = new ByteArrayInputStream(((ByteArrayOutputStream) outStreamEnc).toByteArray());
 
         String decodedString = encryption.decryptMessage(inputStreamDec);
 
-        String encryptedString = Utilities.ConvertOutputStream(encryption.encryptMessage(helloMessage));
-        String decryptedString = encryption.decryptMessage(Utilities.CovertString(encryptedString));
+        String encryptedString = Utilities.convertOutputStream(encryption.encryptMessage(helloMessage));
+        String decryptedString = encryption.decryptMessage(Utilities.convertString(encryptedString));
 
         assertEquals(helloMessage, decryptedString);
         assertEquals(helloMessage, decodedString);
