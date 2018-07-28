@@ -6,7 +6,7 @@ default: pre-build
 
 pre-build:
 	rm -f -- *.out
-	mvn -U clean install
+	mvn -U clean install -gs common/settings.xml
 
 
 
