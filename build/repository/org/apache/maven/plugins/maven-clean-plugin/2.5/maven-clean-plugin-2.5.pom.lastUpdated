@@ -1,15 +1,17 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Sat Jul 28 01:55:05 CEST 2018
+#Sat Jul 28 10:38:22 CEST 2018
 @default-central-proxy-files\:${basedir}repository/.lastUpdated=1532735611329
 localRepository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (localRepository)\: Cannot access localRepository with type default using the available connector factories\: BasicRepositoryConnectorFactory
+file\://${basedir}/common/repository/.error=
 @default-central-proxy-files\://${basedir}/repository/.lastUpdated=1532735666304
 @default-central-proxy-localRepository/.lastUpdated=1532735355393
 @default-central-proxy-files\://repository/.lastUpdated=1532735528096
 files\:${basedir}repository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (files\:${basedir}repository)\: Cannot access files\:${basedir}repository with type default using the available connector factories\: BasicRepositoryConnectorFactory
-files\://F\:/Project/BiBiFi-Dependencies/BabyHack/build/common/repository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (files\://F\:/Project/BiBiFi-Dependencies/BabyHack/build/common/repository)\: Cannot access files\://F\:/Project/BiBiFi-Dependencies/BabyHack/build/common/repository with type default using the available connector factories\: BasicRepositoryConnectorFactory
 files\://repository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (files\://repository)\: Cannot access files\://repository with type default using the available connector factories\: BasicRepositoryConnectorFactory
+files\://F\:/Project/BiBiFi-Dependencies/BabyHack/build/common/repository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (files\://F\:/Project/BiBiFi-Dependencies/BabyHack/build/common/repository)\: Cannot access files\://F\:/Project/BiBiFi-Dependencies/BabyHack/build/common/repository with type default using the available connector factories\: BasicRepositoryConnectorFactory
 @default-central-proxy-files\://./repository/.lastUpdated=1532735484017
 files\://${basedir}/repository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (files\://${basedir}/repository)\: Cannot access files\://${basedir}/repository with type default using the available connector factories\: BasicRepositoryConnectorFactory
+file\://${basedir}/common/repository/.lastUpdated=1532767102815
 @default-central-proxy-files\:${basedir}/repository/.lastUpdated=1532735628618
 files\:${basedir}/repository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (files\:${basedir}/repository)\: Cannot access files\:${basedir}/repository with type default using the available connector factories\: BasicRepositoryConnectorFactory
 files\://./repository/.error=Could not transfer artifact org.apache.maven.plugins\:maven-clean-plugin\:pom\:2.5 from/to central-proxy (files\://./repository)\: Cannot access files\://./repository with type default using the available connector factories\: BasicRepositoryConnectorFactory

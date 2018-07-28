@@ -69,6 +69,7 @@ under the License.
    | Default: false
   <offline>false</offline>
   -->
+  <offline>true</offline>
 
   <!-- pluginGroups
    | This is a list of additional group identifiers that will be searched when resolving plugins by their prefix, i.e.
@@ -159,7 +160,7 @@ under the License.
     <mirror>
       <id>central-proxy</id>
       <name>Local proxy of central repo</name>
-      <url>file://F:/Project/BiBiFi-Dependencies/BabyHack/build/common/repository/</url>
+      <url>file://${basedir}/./common/repository</url>
       <mirrorOf>central</mirrorOf>
     </mirror>
   </mirrors>
@@ -215,6 +216,20 @@ under the License.
       </repositories>
     </profile>
     -->
+      <profile>
+          <repositories>
+              <repository>
+                  <id>repo1</id>
+                  <releases>
+                      <enabled>true</enabled>
+                  </releases>
+                  <snapshots>
+                      <enabled>true</enabled>
+                  </snapshots>
+                  <url>file://${basedir}/common/repository</url>
+              </repository>
+          </repositories>
+      </profile>
 
     <!--
      | Here is another profile, activated by the system property 'target-env' with a value of 'dev',

@@ -20,15 +20,26 @@
         <module>commons</module>
     </modules>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>plugrepo</id>
+            <name>plugrepo</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <url>file://${basedir}/./common/repository</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <repositories>
-    <repository>
-        <id>repo</id>
-        <name>repo</name>
-        <releases>
-            <enabled>true</enabled>
-        </releases>
-        <url>file://./common/repository</url>
-    </repository>
+        <repository>
+            <id>plugrepo</id>
+            <name>plugrepo</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <url>file://${basedir}/./common/repository</url>
+        </repository>
     </repositories>
 
     <dependencies>
