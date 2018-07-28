@@ -18,7 +18,6 @@ public class Client implements IClient {
 
 
     public void clientRequest(TransmissionPacket request, String authFileName) throws IOException {
-
         String jsonRequest = Utilities.Serializer(request);
        // IEncryption encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(authFileName).getKey());
         
@@ -27,6 +26,7 @@ public class Client implements IClient {
         PrintWriter printWriter = new PrintWriter(outputStream, true);
         InputStream inputStream = sock.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
         printWriter.println(jsonRequest);
 
         String receivedMessge;
@@ -40,13 +40,11 @@ public class Client implements IClient {
             return;
         }
     //    String response = encryption.decryptMessage(inputStream);
-
-
-    }
+ }
 
     public static void main(String[] args) throws IOException{
         RequestProcessor processor = new RequestProcessor();
-        TransmissionPacket packet = processor.generateRequest(RequestType.CREATE, "dummy",12,null);
+        TransmissionPacket packet = processor.generateRequest(RequestType.CREATE, "ZainBurhan",12,null);
         Client client = new Client();
         client.clientRequest(packet,"bank.auth");
     }

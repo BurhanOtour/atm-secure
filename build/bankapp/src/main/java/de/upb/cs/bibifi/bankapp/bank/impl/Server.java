@@ -61,6 +61,7 @@ public class Server implements IServer {
             Socket sock = serverSocket.accept();
             OutputStream out = sock.getOutputStream();
             PrintWriter print = new PrintWriter(out, true);
+
             InputStream istream = sock.getInputStream();
             BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
             String receiveMessage;
@@ -82,6 +83,7 @@ public class Server implements IServer {
     private boolean validTransmission(TransmissionPacket packet) {
         return true;
     }
+
 
     public void cleanup() {
         // @TODO CLEANUP is a mehtod that would be could upon exists using SIGTERM
