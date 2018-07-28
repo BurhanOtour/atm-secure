@@ -38,13 +38,14 @@ public class Bank implements IBank {
 
     @Override
     public void startup(String authFileName) throws Exception {
-        // @TODO check auth file name validity
-        this.authFile = authFileName == null || authFileName.isEmpty() ? AppConstants.DEFAULT_AUTH_FILE_NAME : authFileName;
-        if ((new File(this.authFile)).exists()) {
-            throw new IllegalStateException("Auth file already exists");
-        }
-        createAuthFile(this.authFile);
-        System.out.println(AppConstants.BANK_CREATION_CONFIRMATION_MESSAGE);
+//        // @TODO check auth file name validity
+//        this.authFile = authFileName == null || authFileName.isEmpty() ? AppConstants.DEFAULT_AUTH_FILE_NAME : authFileName;
+//        if ((new File(this.authFile)).exists()) {
+//            throw new IllegalStateException("Auth file already exists");
+//        }
+//        createAuthFile(this.authFile);
+//        System.out.println(AppConstants.BANK_CREATION_CONFIRMATION_MESSAGE);
+        this.authFile = authFileName;
     }
 
     /**

@@ -4,5 +4,5 @@ public enum RequestType {
     CREATE,
     DEPOSIT,
     WITHDRAW,
-    CHECKBALANCE
+    CHECKBALANCE,
 }

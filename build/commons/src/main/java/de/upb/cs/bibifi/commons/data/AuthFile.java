@@ -26,6 +26,7 @@ public class AuthFile {
     public static AuthFile getAuthFile(String authFilePath) throws IOException {
         Gson gson = new Gson();
         String string = FileUtils.readFileToString(new File(authFilePath), "UTF-8");
+
         return gson.fromJson(string, AuthFile.class);
     }
 
