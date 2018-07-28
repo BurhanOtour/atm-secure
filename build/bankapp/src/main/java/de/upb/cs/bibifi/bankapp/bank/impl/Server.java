@@ -1,11 +1,13 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
-import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.bankapp.bank.IServer;
-import de.upb.cs.bibifi.commons.ITransmissionPacketProcessor;
+import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
+import de.upb.cs.bibifi.bankapp.constants.AppConstants;
+import de.upb.cs.bibifi.commons.IEncryption;
+import de.upb.cs.bibifi.commons.data.AuthFile;
+import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
-import de.upb.cs.bibifi.commons.enums.RequestType;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -14,69 +16,59 @@ import java.net.Socket;
 
 public class Server implements IServer {
 
+    private ServerSocket serverSocket;
+    private IServerProcessor processor;
 
-//    private String executeOperation(TransmissionPacket transmissionPacket) throws Exception {
-//
-//        IBank bank = Bank.getBank();
-//
-//        if (transmissionPacket.getRequestType() == RequestType.CREATE) {
-//            String accountName = transmissionPacket.getProperty("accountName");
-//            Integer balance = Integer.parseInt(transmissionPacket.getProperty("initialBalance"));
-//
-//            String pin = bank.createBalance(accountName, balance);
-//            TransmissionPacket packet = new TransmissionPacket();
-//            packet.setProperty ("pin", pin);
-//            packet.setProperty ("balance", balance.toString());
-//            packet.setProperty("accountName", accountName);
-//            packet.setRequestType(RequestType.CREATE);
-//            //return processor.encryptMessage(packet);
-//            return Utilities.Serializer(packet);
-//        }
-//
-//        if (transmissionPacket.getRequestType() == RequestType.DEPOSIT) {
-//            //Call bank Method Here
-//        }
-//
-//        if (transmissionPacket.getRequestType() == RequestType.WITHDRAW) {
-//            //Call bank Method Here
-//        }
-//
-//        if (transmissionPacket.getRequestType() == RequestType.CHECKBALANCE) {
-//            //Call bank Method Here
-//        }
-//        return null;
-//    }
-//
-//    private String processRequest(String requestBody) throws Exception {
-//        TransmissionPacket transmissionPacket = Utilities.deserializer(requestBody);
-//        return executeOperation(transmissionPacket);
-//    }
+    private IEncryption encryption;
+    private String authFile = null;
+    private int port = 0;
 
-    @Override
-    public void startServer(int port) throws Exception {
-        ServerSocket serverSocket = new ServerSocket(port);
-        ServerProcessor processor = ServerProcessor.getServerProcessor();
 
-        while (true) {
-            Socket sock = serverSocket.accept();
-            OutputStream ostream = sock.getOutputStream();
-            PrintWriter pwrite = new PrintWriter(ostream, true);
-            InputStream istream = sock.getInputStream();
-            BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-            String receiveMessage, sendMessage;
-            if ((receiveMessage = receiveRead.readLine()) != null) {
+    //@TODO Add input validation and handling
+    public static void main(String[] args) {
+        // Handle argument input
+        String authFileName = AppConstants.DEFAULT_AUTH_FILE_NAME;
+        int port = AppConstants.DEFAULT_PORT_NUMBER;
 
-                System.out.println("Request Receeived:"+ receiveMessage);
-                //InputStream targetStream = new ByteArrayInputStream(receiveMessage.getBytes());
-                TransmissionPacket packet = Utilities.deserializer (receiveMessage);
-
-                //TransmissionPacket packet = processor.decryptMessage(targetStream);
-                String resStream = processor.executeOperation (packet);
-                pwrite.println(resStream);
-                pwrite.flush();
-            }
-
+        try {
+            IServer server = new Server(port, authFileName);
+            server.start();
+        } catch (Exception e) {
+            System.out.println(255);
+            System.exit(-1);
         }
     }
 
+    public Server(int port, String authFile) throws Exception {
+        this.authFile = authFile;
+        this.port = port;
+        this.serverSocket = new ServerSocket(port);
+        this.processor = ServerProcessor.getServerProcessor();
+        Bank.getBank().startup(authFile);
+        encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
+    }
+
+    @Override
+    public void start() throws Exception {
+        while (true) {
+            Socket sock = serverSocket.accept();
+            OutputStream out = sock.getOutputStream();
+            PrintWriter print = new PrintWriter(out, true);
+            InputStream is = sock.getInputStream();
+            IEncryption e = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
+            String json = e.decryptMessage(is);
+            TransmissionPacket requestPkt = Utilities.deserializer(json);
+            if (validTransmission(requestPkt)) {
+                String resStream = processor.executeOperation(requestPkt);
+                print.println(encryption.encryptMessage(resStream));
+                print.flush();
+            } else {
+                continue;
+            }
+        }
+    }
+
+    private boolean validTransmission(TransmissionPacket packet) {
+        return true;
+    }
 }

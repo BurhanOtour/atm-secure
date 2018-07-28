@@ -8,4 +8,12 @@ public class AppConstants {
     public static final String CRYPTO_ALGORITHM_NAME = "AES";
     public static final int MIN_PIN_NUMBER = 1000;
     public static final int MAX_PIN_NUMBER = 9999;
+
+    public static final String KEY_ACCOUNT_NAME = "account";
+    public static final String KEY_INITIAL_BALANCE = "initial_balance";
+    public static final String KEY_DEPOSITE = "deposite";
+    public static final String KEY_BALANCE = "balance";
+    public static final String KEY_WIHTDRAW = "withdraw";
+
+    public static final String KEY_PIN = "pin";
 }
