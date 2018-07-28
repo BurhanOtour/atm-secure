@@ -20,8 +20,8 @@ public class EncryptionImpl implements IEncryption {
 
     private static String algoName = "AES";
 
-//    private static String transformation = "AES/CBC/PKCS5Padding";
-    private static String transformation = "AES/ECB/NoPadding";
+   private static String transformation = "AES/CBC/PKCS5Padding";
+ //   private static String transformation = "AES/ECB/NoPadding";
     private byte[] key;
 
     private static EncryptionImpl singleton;
@@ -54,7 +54,7 @@ public class EncryptionImpl implements IEncryption {
             return outputStream;
         } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | BadPaddingException |
                 InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException ex) {
-            throw new IOException("Error happened with encryption the message");
+            throw new IOException("Error happened with encryption the message",ex);
         }
     }
 

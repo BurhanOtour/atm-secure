@@ -6,5 +6,6 @@ import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import java.io.IOException;
 
 interface IClient {
-    TransmissionPacket clientRequest (TransmissionPacket msg) throws Exception;
+    //Client(ip, port)
+    void clientRequest (TransmissionPacket request, String authFileName) throws IOException;
 }

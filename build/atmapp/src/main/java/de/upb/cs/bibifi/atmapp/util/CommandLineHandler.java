@@ -65,7 +65,7 @@ public class CommandLineHandler {
             String ip = commandLine.getOptionValue("ip", "127.0.0.1");
             Integer port = Integer.parseInt(commandLine.getOptionValue("port", "25001"));
 
-            this.atm = new Atm(new Client(ip, port));
+           // this.atm = new Atm(new Client(ip, port));
 
         } catch (ParseException e) {
             e.printStackTrace();

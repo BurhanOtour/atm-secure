@@ -42,7 +42,7 @@ public class Atm implements IATM {
 
         try {
 
-            TransmissionPacket transmissionPacket = client.clientRequest(request);
+            /** TransmissionPacket transmissionPacket = client.clientRequest(request);
 
 
 
@@ -50,6 +50,7 @@ public class Atm implements IATM {
                     .stream()
                     .forEach(System.out::println);// TODO: 27/07/2018 print what is needed only
 
+*/
         } catch (Exception e) {
             e.printStackTrace();
         }
