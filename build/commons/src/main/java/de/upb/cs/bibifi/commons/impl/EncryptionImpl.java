@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 
 public class EncryptionImpl implements IEncryption {
@@ -32,7 +33,7 @@ public class EncryptionImpl implements IEncryption {
         if (singleton == null)
             singleton = new EncryptionImpl();
 
-        singleton.key = key.getBytes(StandardCharsets.ISO_8859_1);
+        singleton.key =  Base64.getDecoder().decode(key);
         return singleton;
     }
 

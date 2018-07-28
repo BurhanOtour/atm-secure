@@ -34,7 +34,7 @@ public class AuthFileContentGeneratorImpl implements IAuthFileContentGenerator {
         random.nextBytes(saltBytesArray);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("key", new String(secretKeyBytesArray, StandardCharsets.ISO_8859_1));
+        jsonObject.put("key", Base64.getEncoder().encodeToString(secretKeyBytesArray));
         jsonObject.put("salt", new String(saltBytesArray));
         String jsonString = jsonObject.toString();
 
