@@ -12,4 +12,8 @@ public interface IBank {
     boolean withdraw(String acc, String pin, int balance) throws Exception;
 
     int checkBalance(String acc, String pin) throws Exception;
+
+    public void commit();
+
+    public void undo();
 }

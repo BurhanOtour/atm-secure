@@ -16,4 +16,5 @@ class AccountTest {
         assertNotEquals(acc1.hashCode(), acc3.hashCode());
         assertFalse(acc1.equals(acc3));
     }
+
 }

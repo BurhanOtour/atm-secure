@@ -5,7 +5,10 @@ import de.upb.cs.bibifi.bankapp.bank.IAuthFileContentGenerator;
 import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.bankapp.constants.AppConstants;
 import de.upb.cs.bibifi.bankapp.data.Account;
+import de.upb.cs.bibifi.bankapp.exceptions.SystemException;
 import de.upb.cs.bibifi.commons.data.AuthFile;
+import de.upb.cs.bibifi.commons.dto.Request;
+import de.upb.cs.bibifi.commons.enums.RequestType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
@@ -16,9 +19,15 @@ import java.util.HashMap;
 public class Bank implements IBank {
     private String authFile;
 
+    private int currentBalance;
+
+    private Account currentAccount;
+
     private Gson gson = new Gson();
 
     private HashMap<String, Account> accounts = new HashMap<>();
+
+    private RequestType type = null;
 
     private Bank() {
     }
@@ -62,17 +71,25 @@ public class Bank implements IBank {
             throw new Exception("Balance is less than 10.00");
         }
         String generatedPin = generatePIN();
-        accounts.put(acc, new Account(balance, acc, hashMessage(generatedPin + getSalt())));
+        Account newAccount = new Account(balance, acc, hashMessage(generatedPin + getSalt()));
+        currentAccount = newAccount;
+        this.type = RequestType.CREATE;
+        accounts.put(acc, newAccount);
         return generatedPin;
     }
 
     @Override
-    public boolean deposit(String acc, String pin, int balance) throws Exception {
+    public boolean deposit(String acc, String pin, int balance) throws SystemException, IOException {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
-            throw new Exception("Account is not valid!");
+            throw new SystemException("Account is not valid!");
         }
-        account.addBalance(balance);
+        if (balance <= 0) {
+            throw new SystemException("Amount is negative or zero");
+        }
+        this.currentAccount = account;
+        this.type = RequestType.DEPOSIT;
+        this.currentBalance = balance;
         return account.addBalance(balance);
     }
 
@@ -82,6 +99,10 @@ public class Bank implements IBank {
         if (account == null) {
             throw new Exception("Account is not valid!");
         }
+
+        this.type = RequestType.WITHDRAW;
+        this.currentBalance = balance;
+        this.currentAccount = account;
         return account.withdrawBalance(balance);
     }
 
@@ -92,6 +113,37 @@ public class Bank implements IBank {
             throw new Exception("Account is not valid!");
         }
         return account.getBalance();
+    }
+
+    @Override
+    public void commit() {
+        resetTransaction();
+    }
+
+    @Override
+    public void undo() {
+        if (type != null) {
+            switch (type) {
+                case CREATE:
+                    accounts.remove(currentAccount.getName());
+                    resetTransaction();
+                    break;
+                case DEPOSIT:
+                    currentAccount.withdrawBalance(currentBalance);
+                    resetTransaction();
+                    break;
+                case WITHDRAW:
+                    currentAccount.addBalance(currentBalance);
+                    resetTransaction();
+                    break;
+            }
+        }
+    }
+
+    private void resetTransaction() {
+        this.type = null;
+        this.currentAccount = null;
+        this.currentBalance = 0;
     }
 
     public String hashMessage(String message) throws IOException {
@@ -122,5 +174,11 @@ public class Bank implements IBank {
             return null;
         }
         return account;
+    }
+
+    public void reset(){
+        resetTransaction();
+        accounts = null;
+        bank = null;
     }
 }
