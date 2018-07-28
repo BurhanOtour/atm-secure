@@ -44,8 +44,8 @@ class BankTest {
 
     @Test
     void twoMessagesResultInTheSameHashTest() throws IOException {
-        String message1 = "Hello Wolrd!";
-        String message2 = "Hello Wolrd!";
+        String message1 = "Hello World!";
+        String message2 = "Hello World!";
         Bank bank = (Bank) Bank.getBank();
         assertEquals(bank.hashMessage(message1), bank.hashMessage(message2));
     }

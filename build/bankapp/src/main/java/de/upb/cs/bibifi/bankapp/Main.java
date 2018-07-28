@@ -1,23 +1,17 @@
 package de.upb.cs.bibifi.bankapp;
 
-import com.google.gson.Gson;
-import de.upb.cs.bibifi.bankapp.bank.IAuthFileContentGenerator;
-import de.upb.cs.bibifi.bankapp.bank.IBank;
-import de.upb.cs.bibifi.bankapp.bank.impl.AuthFileContentGeneratorImpl;
+
 import de.upb.cs.bibifi.bankapp.bank.impl.Bank;
 import de.upb.cs.bibifi.bankapp.bank.impl.Server;
-import de.upb.cs.bibifi.bankapp.data.Account;
 import de.upb.cs.bibifi.commons.ITransmissionPacketProcessor;
 import de.upb.cs.bibifi.commons.data.AuthFile;
-import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
-import de.upb.cs.bibifi.commons.impl.TransmissionPacketProcessor;
-import de.upb.cs.bibifi.commons.impl.Utilities;
+import de.upb.cs.bibifi.commons.dto.Status;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.enums.RequestType;
+import de.upb.cs.bibifi.commons.enums.StatusCode;
+import de.upb.cs.bibifi.commons.impl.TransmissionPacketProcessor;
+import de.upb.cs.bibifi.commons.impl.Utilities;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -31,14 +25,16 @@ public class Main {
 //        IBank bank = Bank.getBank();
 //
 //
-        AuthFile auth = AuthFile.getAuthFile("bank.auth");
-        Bank.getBank().startup("bank.auth");
-        ITransmissionPacketProcessor processor = new TransmissionPacketProcessor(new EncryptionImpl(auth.getKey()));
-        new Server(processor).startServer(25000);
+
+        //Bank.getBank().startup("bank.auth");
+        //AuthFile authFile = AuthFile.getAuthFile("bank.auth");
+        //EncryptionImpl.Intialize (key)
+
+        //new Server().startServer(25000);
 
 
 
-      //  new Server().startServer(35000);
+       new Server().startServer(25000);
 
     }
 }

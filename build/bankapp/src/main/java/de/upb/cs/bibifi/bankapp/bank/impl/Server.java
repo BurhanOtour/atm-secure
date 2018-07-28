@@ -14,51 +14,49 @@ import java.net.Socket;
 
 public class Server implements IServer {
 
-    ITransmissionPacketProcessor processor;
 
-    public Server(ITransmissionPacketProcessor processor) {
-        this.processor = processor;
-    }
-
-    private String executeOperation(TransmissionPacket transmissionPacket) throws Exception {
-
-        IBank bank = Bank.getBank();
-        if (transmissionPacket.getRequestType() == RequestType.CREATE) {
-            String accountName = transmissionPacket.getProperty("accountName");
-            Integer balance = Integer.parseInt(transmissionPacket.getProperty("initialBalance"));
-
-            String pin = bank.createBalance(accountName, balance);
-            TransmissionPacket packet = new TransmissionPacket();
-            packet.setProperty ("pin", pin);
-            packet.setProperty ("balance", balance.toString());
-            packet.setProperty("accountName", accountName);
-            packet.setRequestType(RequestType.CREATE);
-            //return processor.encryptMessage(packet);
-            return Utilities.Serializer(packet);
-        }
-
-        if (transmissionPacket.getRequestType() == RequestType.DEPOSIT) {
-            //Call bank Method Here
-        }
-
-        if (transmissionPacket.getRequestType() == RequestType.WITHDRAW) {
-            //Call bank Method Here
-        }
-
-        if (transmissionPacket.getRequestType() == RequestType.CHECKBALANCE) {
-            //Call bank Method Here
-        }
-        return null;
-    }
-
-    private String processRequest(String requestBody) throws Exception {
-        TransmissionPacket transmissionPacket = Utilities.deserializer(requestBody);
-        return executeOperation(transmissionPacket);
-    }
+//    private String executeOperation(TransmissionPacket transmissionPacket) throws Exception {
+//
+//        IBank bank = Bank.getBank();
+//
+//        if (transmissionPacket.getRequestType() == RequestType.CREATE) {
+//            String accountName = transmissionPacket.getProperty("accountName");
+//            Integer balance = Integer.parseInt(transmissionPacket.getProperty("initialBalance"));
+//
+//            String pin = bank.createBalance(accountName, balance);
+//            TransmissionPacket packet = new TransmissionPacket();
+//            packet.setProperty ("pin", pin);
+//            packet.setProperty ("balance", balance.toString());
+//            packet.setProperty("accountName", accountName);
+//            packet.setRequestType(RequestType.CREATE);
+//            //return processor.encryptMessage(packet);
+//            return Utilities.Serializer(packet);
+//        }
+//
+//        if (transmissionPacket.getRequestType() == RequestType.DEPOSIT) {
+//            //Call bank Method Here
+//        }
+//
+//        if (transmissionPacket.getRequestType() == RequestType.WITHDRAW) {
+//            //Call bank Method Here
+//        }
+//
+//        if (transmissionPacket.getRequestType() == RequestType.CHECKBALANCE) {
+//            //Call bank Method Here
+//        }
+//        return null;
+//    }
+//
+//    private String processRequest(String requestBody) throws Exception {
+//        TransmissionPacket transmissionPacket = Utilities.deserializer(requestBody);
+//        return executeOperation(transmissionPacket);
+//    }
 
     @Override
     public void startServer(int port) throws Exception {
         ServerSocket serverSocket = new ServerSocket(port);
+        ServerProcessor processor = ServerProcessor.getServerProcessor();
+
         while (true) {
             Socket sock = serverSocket.accept();
             OutputStream ostream = sock.getOutputStream();
@@ -73,7 +71,7 @@ public class Server implements IServer {
                 TransmissionPacket packet = Utilities.deserializer (receiveMessage);
 
                 //TransmissionPacket packet = processor.decryptMessage(targetStream);
-                String resStream = executeOperation (packet);
+                String resStream = processor.executeOperation (packet);
                 pwrite.println(resStream);
                 pwrite.flush();
             }

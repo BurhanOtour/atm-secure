@@ -3,6 +3,8 @@ package de.upb.cs.bibifi.commons.impl;
 import com.google.gson.Gson;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 
+import java.io.OutputStream;
+
 
 public class Utilities {
 

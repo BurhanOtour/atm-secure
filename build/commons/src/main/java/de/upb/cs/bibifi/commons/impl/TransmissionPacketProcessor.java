@@ -11,9 +11,18 @@ import java.io.OutputStream;
 public class TransmissionPacketProcessor implements ITransmissionPacketProcessor {
 
     private final IEncryption encryption;
+    private static ITransmissionPacketProcessor processor = null;
 
-    public TransmissionPacketProcessor (IEncryption encryption) {
-        this.encryption = encryption;
+    private TransmissionPacketProcessor() {
+        this.encryption = null; // Get Singlton Instance
+    }
+
+    public static ITransmissionPacketProcessor getTransmissionPacketProcessor() {
+        if (processor != null)
+            return processor;
+
+        processor = new TransmissionPacketProcessor();
+        return processor;
     }
 
     @Override

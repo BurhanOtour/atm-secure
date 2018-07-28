@@ -10,16 +10,14 @@ public interface ITransmissionPacketProcessor {
     /**
      * @param inputStream
      * @return
-     * @throws IOException
-     * Decrypts the inputStream into a TransmissionPacket
+     * @throws IOException Decrypts the inputStream into a TransmissionPacket
      */
     TransmissionPacket decryptMessage(InputStream inputStream) throws IOException;
 
     /**
      * @param packet
      * @return
-     * @throws IOException
-     * Encrypts the inputStream into a TransmissionPacket
+     * @throws IOException Encrypts the inputStream into a TransmissionPacket
      */
     OutputStream encryptMessage(TransmissionPacket packet) throws IOException;
 

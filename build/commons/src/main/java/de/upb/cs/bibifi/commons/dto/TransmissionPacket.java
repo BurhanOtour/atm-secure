@@ -1,6 +1,7 @@
 package de.upb.cs.bibifi.commons.dto;
 
 import de.upb.cs.bibifi.commons.enums.RequestType;
+import de.upb.cs.bibifi.commons.enums.StatusCode;
 
 import java.util.HashMap;
 
@@ -8,9 +9,9 @@ public class TransmissionPacket {
 
     private RequestType requestType;
 
-    private HashMap<String, String> properties = new HashMap<>();
+    private HashMap<String, String> properties;
 
-    private Integer statusCode;
+    private Status status;
 
     public RequestType getRequestType() {
         return requestType;
@@ -28,15 +29,27 @@ public class TransmissionPacket {
         this.properties = properties;
     }
 
-    public Integer getStatusCode() {
-        return statusCode;
+    public String getProperty(String key) {
+        return properties.get(key);
     }
 
-    public void setStatusCode(Integer statusCode) {
-        this.statusCode = statusCode;
+    public void setProperty(String key, String value) {
+        if (properties == null)
+            properties = new HashMap<>();
+        properties.put(key, value);
     }
 
-    public String getProperty (String key){ return properties.get(key);}
+    public Status getStatus() {
+        return status;
+    }
 
-    public void setProperty (String key, String value) {properties.put(key, value);}
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void setStatus(Integer statusCode, String msg) {
+        status.setMessage(msg);
+        status.setStatusCode(statusCode);
+    }
+
 }
