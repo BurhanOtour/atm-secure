@@ -62,13 +62,13 @@ public class Bank implements IBank {
      * @return if the account creation protocol is respected it should return the pin back
      */
     @Override
-    public String createBalance(String acc, int balance) throws Exception {
+    public String createBalance(String acc, int balance) {
         Account account = accounts.get(acc);
         if (account != null) {
-            throw new Exception("Account Already Exists");
+            return null;
         }
         if (balance < 10) {
-            throw new Exception("Balance is less than 10.00");
+            return null;
         }
         String generatedPin = generatePIN();
         Account newAccount = new Account(balance, acc, hashMessage(generatedPin + getSalt()));
@@ -79,13 +79,13 @@ public class Bank implements IBank {
     }
 
     @Override
-    public boolean deposit(String acc, String pin, int balance) throws SystemException, IOException {
+    public boolean deposit(String acc, String pin, int balance) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
-            throw new SystemException("Account is not valid!");
+            return false;
         }
         if (balance <= 0) {
-            throw new SystemException("Amount is negative or zero");
+            return false;
         }
         this.currentAccount = account;
         this.type = RequestType.DEPOSIT;
@@ -94,10 +94,10 @@ public class Bank implements IBank {
     }
 
     @Override
-    public boolean withdraw(String acc, String pin, int balance) throws Exception {
+    public boolean withdraw(String acc, String pin, int balance) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
-            throw new Exception("Account is not valid!");
+            return false;
         }
 
         this.type = RequestType.WITHDRAW;
@@ -107,10 +107,10 @@ public class Bank implements IBank {
     }
 
     @Override
-    public int checkBalance(String acc, String pin) throws Exception {
+    public int checkBalance(String acc, String pin) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
-            throw new Exception("Account is not valid!");
+            return -1;
         }
         return account.getBalance();
     }
@@ -146,7 +146,7 @@ public class Bank implements IBank {
         this.currentBalance = 0;
     }
 
-    public String hashMessage(String message) throws IOException {
+    public String hashMessage(String message) {
         return DigestUtils.sha1Hex(message + getSalt());
     }
 
@@ -164,11 +164,11 @@ public class Bank implements IBank {
         return String.valueOf(randomPIN);
     }
 
-    private String getSalt() throws IOException {
+    private String getSalt() {
         return AuthFile.getAuthFile(this.authFile).getSalt();
     }
 
-    private Account validateAccountData(String acc, String pin) throws IOException {
+    private Account validateAccountData(String acc, String pin) {
         Account account = accounts.get(acc);
         if (account == null || !account.getHashedPin().equals(hashMessage(pin + getSalt()))) {
             return null;
@@ -176,7 +176,7 @@ public class Bank implements IBank {
         return account;
     }
 
-    public void reset(){
+    public void reset() {
         resetTransaction();
         accounts = null;
         bank = null;

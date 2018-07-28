@@ -23,9 +23,14 @@ public class AuthFile {
         return salt;
     }
 
-    public static AuthFile getAuthFile(String authFilePath) throws IOException {
+    public static AuthFile getAuthFile(String authFilePath) {
         Gson gson = new Gson();
-        String string = FileUtils.readFileToString(new File(authFilePath), "UTF-8");
+        String string = null;
+        try {
+            string = FileUtils.readFileToString(new File(authFilePath), "UTF-8");
+        } catch (IOException e) {
+            System.exit(-1);
+        }
         return gson.fromJson(string, AuthFile.class);
     }
 

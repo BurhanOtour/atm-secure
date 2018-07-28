@@ -71,12 +71,7 @@ class BankTest {
         assertEquals(sampleBalance, bank.checkBalance("foo", pin));
         assertEquals(sampleBalance, bank.checkBalance("foo", pin));
         bank.undo();
-        try {
-            bank.checkBalance("foo", pin);
-            fail("The bank should not be existed anymore");
-        } catch (Exception e) {
-            assertTrue(true);
-        }
+        assertEquals(-1, Bank.getBank().checkBalance("foo", pin));
     }
 
     @Test
@@ -151,22 +146,22 @@ class BankTest {
         Bank.getBank().commit();
         Bank.getBank().commit();
 
-        assertFalse(Bank.getBank().withdraw("foo",fooPin,-1000));
+        assertFalse(Bank.getBank().withdraw("foo", fooPin, -1000));
         Bank.getBank().commit();
-        assertFalse(Bank.getBank().withdraw("foo",fooPin,13));
+        assertFalse(Bank.getBank().withdraw("foo", fooPin, 13));
         Bank.getBank().commit();
-        assertTrue(Bank.getBank().withdraw("foo",fooPin,12));
+        assertTrue(Bank.getBank().withdraw("foo", fooPin, 12));
         Bank.getBank().commit();
-        assertTrue(Bank.getBank().deposit("foo",fooPin,10));
+        assertTrue(Bank.getBank().deposit("foo", fooPin, 10));
         Bank.getBank().undo();
         // That doesn't have any effect since we already undone the work
         Bank.getBank().commit();
-        assertEquals(0,Bank.getBank().checkBalance("foo",fooPin));
-        assertTrue(Bank.getBank().deposit("foo",fooPin,10));
+        assertEquals(0, Bank.getBank().checkBalance("foo", fooPin));
+        assertTrue(Bank.getBank().deposit("foo", fooPin, 10));
         Bank.getBank().commit();
-        assertTrue(Bank.getBank().withdraw("foo",fooPin,10));
+        assertTrue(Bank.getBank().withdraw("foo", fooPin, 10));
         Bank.getBank().undo();
-        assertEquals(10,Bank.getBank().checkBalance("foo",fooPin));
+        assertEquals(10, Bank.getBank().checkBalance("foo", fooPin));
     }
 
     @Test
