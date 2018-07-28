@@ -33,7 +33,6 @@ public class ValidatorTest  {
     public void testValidateAccountName() {
         Validator validator = new Validator();
         Assertions.assertTrue(validator.validateAccountName("."));
-        //Assertions.assertFalse(validator.validateAccountName("?f§"));
     }
     @Test
     public void validateInitialBalance() {
