@@ -18,7 +18,7 @@ public interface IEncryption {
 	  OutputStream encryptMessage(String message) throws IOException;
 
 	/**
-	 * Deserializes a representable by decrypting it from an input stream
+	 * Deserialize a representable by decrypting it from an input stream
 	 *
 	 * @param inputStream The input stream which can be read in order to receive the encrypted representable
 	 *
