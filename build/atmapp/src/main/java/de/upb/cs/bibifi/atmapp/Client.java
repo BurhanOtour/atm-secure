@@ -63,9 +63,7 @@ public class Client implements IClient {
                 responseObject = gson.fromJson(receivedMessage, Response.class);
             }
             if (responseObject.getCode() == 255 || responseObject.getCode() == 67) {
-                System.out.println(responseObject.getCode());
                 System.exit(255);
-                return;
             }
             if (responseObject.getCode() == 0) {
                 if (request.getRequestType() == RequestType.CREATE) {
@@ -83,8 +81,7 @@ public class Client implements IClient {
     private void savePin(String pin) throws Exception {
         File file = new File(cardFileName);
         if (file.exists()) {
-            System.out.println(255);
-            System.exit(-1);
+            System.exit(255);
         }
         FileUtils.writeStringToFile(file, EncryptionImpl.getInstance().encryptMessage(pin), "UTF-8");
     }
@@ -96,7 +93,7 @@ public class Client implements IClient {
         try {
             client.clientRequest(packet);
         } catch (Exception e) {
-            System.out.println(255);
+            System.exit(255);
         }
     }
 }

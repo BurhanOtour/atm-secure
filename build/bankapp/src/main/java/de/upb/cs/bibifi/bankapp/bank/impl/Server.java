@@ -51,8 +51,7 @@ public class Server implements IServer {
                     , commandLine.getOptionValue("authfile", AppConstants.DEFAULT_AUTH_FILE_NAME));
             server.start();
         } catch (Exception e) {
-            System.out.println(255);
-            System.exit(-1);
+            System.exit(255);
         }
     }
 
@@ -118,7 +117,7 @@ public class Server implements IServer {
             try {
                 cleanup();
             } catch (IOException e) {
-                System.out.println(255);
+                System.exit(255);
             }
         }
     }
