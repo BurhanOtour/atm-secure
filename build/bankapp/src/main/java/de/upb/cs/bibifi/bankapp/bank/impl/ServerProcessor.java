@@ -115,19 +115,20 @@ public class ServerProcessor implements IServerProcessor {
         switch (type) {
             case CREATE:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
-                obj.put(KEY_INITIAL_BALANCE, transmissionPacket.getProperty(KEY_INITIAL_BALANCE));
+                obj.put(KEY_INITIAL_BALANCE, Integer.parseInt(transmissionPacket.getProperty(KEY_BALANCE)));
                 message = obj.toString();
                 response = new CreationResponse(message, 0, data);
+                System.out.println(response.getMessage());
                 break;
             case DEPOSIT:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
-                obj.put(KEY_DEPOSITE, transmissionPacket.getProperty(KEY_DEPOSITE));
+                obj.put(KEY_DEPOSITE, Integer.parseInt(transmissionPacket.getProperty(KEY_DEPOSITE)));
                 message = obj.toString();
                 response = new Response(message, 0);
                 break;
             case WITHDRAW:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
-                obj.put(KEY_WIHTDRAW, transmissionPacket.getProperty(KEY_WIHTDRAW));
+                obj.put(KEY_WIHTDRAW, Integer.parseInt(transmissionPacket.getProperty(KEY_WIHTDRAW)));
                 message = obj.toString();
                 response = new Response(message, 0);
                 break;

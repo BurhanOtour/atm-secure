@@ -86,7 +86,6 @@ public class Server implements IServer {
             //Receive msg and decrypt the message
             if ((receiveMessage = receiveRead.readLine()) != null) {
                 decryptMsg = encryption.decryptMessage(receiveMessage);
-                System.out.println(decryptMsg);
             }
 
             //Take decrypted msg and make pkt
