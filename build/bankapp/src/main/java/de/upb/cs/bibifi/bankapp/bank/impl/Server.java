@@ -58,21 +58,28 @@ public class Server implements IServer {
     @Override
     public void start() throws Exception {
         while (true) {
+            //Open Socket for accepting request
             Socket sock = serverSocket.accept();
             OutputStream out = sock.getOutputStream();
             PrintWriter print = new PrintWriter(out, true);
 
             InputStream istream = sock.getInputStream();
             BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-            String receiveMessage;
+            String receiveMessage,decryptMsg = null;
+
+            //Receive msg and decrypt the message
             if ((receiveMessage = receiveRead.readLine()) != null) {
-                System.out.println(receiveMessage);
+                decryptMsg = EncryptionImpl.getInstance().decryptMessage(receiveMessage);
+                System.out.println(decryptMsg);
             }
-            String json = receiveMessage.toString();
+
+            //Take decrypted msg and make pkt
+            String json = decryptMsg.toString();
             TransmissionPacket requestPkt = Utilities.deserializer(json);
             if (validTransmission(requestPkt)) {
-                String resStream = processor.executeOperation(requestPkt);
-                print.println(resStream);
+                String resJson = processor.executeOperation(requestPkt);
+                String response = encryption.decryptMessage(resJson);
+                print.println(response);
                 print.flush();
             } else {
                 continue;

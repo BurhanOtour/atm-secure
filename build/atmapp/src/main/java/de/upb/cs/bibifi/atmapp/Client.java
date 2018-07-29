@@ -13,37 +13,44 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class Client implements IClient {
 
 
     public void clientRequest(TransmissionPacket request, String authFileName) throws IOException {
         String jsonRequest = Utilities.Serializer(request);
-       // IEncryption encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(authFileName).getKey());
+        IEncryption encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(authFileName).getKey());
         
         Socket sock = new Socket("127.0.0.1", 3000);
         OutputStream outputStream = sock.getOutputStream();
         PrintWriter printWriter = new PrintWriter(outputStream, true);
         InputStream inputStream = sock.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        printWriter.println(jsonRequest);
 
+        //Encrypt the json request and send it to socket
+        String encyptString = encryption.encryptMessageString(jsonRequest);
+        printWriter.println(encyptString);
+
+        //Receive the response
         String receivedMessge;
         if((receivedMessge = br.readLine())!=null){
             System.out.println(receivedMessge);
+
+            //Decrypt the message
+            String response = encryption.decryptMessage(receivedMessge);
             Gson gson = new Gson();
-            CreationResponse responseObject = gson.fromJson(receivedMessge, CreationResponse.class);
+            CreationResponse responseObject = gson.fromJson(response, CreationResponse.class);
             System.out.println(responseObject.getMessage());
             printWriter.flush();
             sock.close();
             return;
         }
-    //    String response = encryption.decryptMessage(inputStream);
- }
+    }
 
     public static void main(String[] args) throws IOException{
         RequestProcessor processor = new RequestProcessor();
-        TransmissionPacket packet = processor.generateRequest(RequestType.CREATE, "dummy",12,null);
+        TransmissionPacket packet = processor.generateRequest(RequestType.CREATE, "dummy12",12,null);
         Client client = new Client();
         client.clientRequest(packet,"bank.auth");
     }

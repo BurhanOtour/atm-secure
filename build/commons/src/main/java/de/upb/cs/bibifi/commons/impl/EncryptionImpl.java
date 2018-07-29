@@ -58,9 +58,39 @@ public class EncryptionImpl implements IEncryption {
         }
     }
 
+    @Override
+    public String encryptMessageString(String message) throws IOException {
+        try {
+            byte[] encryptedArray = message.getBytes();
+            SecretKey secKey = new SecretKeySpec(key, algoName);
+            Cipher aes = Cipher.getInstance(transformation);
+            aes.init(Cipher.DECRYPT_MODE, secKey, new IvParameterSpec(key));
+            byte[] decryptedBytes = aes.doFinal(encryptedArray);
+            return new String(decryptedBytes);
+        } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | BadPaddingException |
+                InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException ex) {
+            throw new IOException("Error happened with decryption the message", ex);
+        }
+    }
+
     public String decryptMessage(InputStream inputStream) throws IOException {
         try {
             byte[] encryptedArray = readBytes(inputStream);
+            SecretKey secKey = new SecretKeySpec(key, algoName);
+            Cipher aes = Cipher.getInstance(transformation);
+            aes.init(Cipher.DECRYPT_MODE, secKey, new IvParameterSpec(key));
+            byte[] decryptedBytes = aes.doFinal(encryptedArray);
+            return new String(decryptedBytes);
+        } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | BadPaddingException |
+                InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException ex) {
+            throw new IOException("Error happened with decryption the message", ex);
+        }
+    }
+
+    @Override
+    public String decryptMessage(String input) throws IOException {
+        try {
+            byte[] encryptedArray = input.getBytes();
             SecretKey secKey = new SecretKeySpec(key, algoName);
             Cipher aes = Cipher.getInstance(transformation);
             aes.init(Cipher.DECRYPT_MODE, secKey, new IvParameterSpec(key));
