@@ -1,5 +1,6 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
+import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.bankapp.bank.IServer;
 import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
 import de.upb.cs.bibifi.commons.constants.AppConstants;
@@ -8,6 +9,7 @@ import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -92,21 +94,19 @@ public class Server implements IServer {
     }
 
 
-    public void cleanup() {
-        // @TODO CLEANUP is a mehtod that would be could upon exists using SIGTERM
-        // stop running threads
-        // store data to DB
-        // close connection to DB
-        // disconnect...
-        // release other resources...
+    public void cleanup() throws IOException {
+        FileUtils.forceDelete(new File(authFile));
     }
 
 
     private class ShutdownHook extends Thread {
         @Override
         public void run() {
-            System.out.println("Shutdown Server process is activated");
-            cleanup();
+            try {
+                cleanup();
+            } catch (IOException e) {
+                System.out.println(255);
+            }
         }
     }
 }
