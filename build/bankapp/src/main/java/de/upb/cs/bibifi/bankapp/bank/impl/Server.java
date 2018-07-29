@@ -78,8 +78,8 @@ public class Server implements IServer {
             TransmissionPacket requestPkt = Utilities.deserializer(json);
             if (validTransmission(requestPkt)) {
                 String resJson = processor.executeOperation(requestPkt);
-                String response = encryption.decryptMessage(Utilities.convertString(resJson));
-                print.println(response);
+                String response = Utilities.convertOutputStream(encryption.encryptMessage(resJson));
+                print.println(resJson);
                 print.flush();
             } else {
                 continue;
