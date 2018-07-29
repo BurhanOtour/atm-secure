@@ -9,6 +9,7 @@ import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -29,12 +30,25 @@ public class Server implements IServer {
 
     //@TODO Add input validation and handling
     public static void main(String[] args) {
-        // Handle argument input
-        String authFileName = AppConstants.DEFAULT_AUTH_FILE_NAME;
-        int port = AppConstants.DEFAULT_PORT_NUMBER;
+
+        CommandLineParser commandLineParser = new DefaultParser();
+
+        CommandLine commandLine = null;
+
+        Options options = new Options();
+
+        options.addOption("s", "authfile", true, "Authentication File");
+        options.addOption("p", "port", true, "port");
 
         try {
-            IServer server = new Server(port, authFileName);
+            commandLine = commandLineParser.parse(options, args);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            IServer server = new Server(Integer.parseInt(commandLine.getOptionValue("p", String.valueOf(AppConstants.DEFAULT_PORT_NUMBER)))
+                    , commandLine.getOptionValue("s", AppConstants.DEFAULT_AUTH_FILE_NAME));
             server.start();
         } catch (Exception e) {
             System.out.println(255);
@@ -67,7 +81,7 @@ public class Server implements IServer {
 
             InputStream istream = sock.getInputStream();
             BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-            String receiveMessage,decryptMsg = null;
+            String receiveMessage, decryptMsg = null;
 
             //Receive msg and decrypt the message
             if ((receiveMessage = receiveRead.readLine()) != null) {
