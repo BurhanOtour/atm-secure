@@ -53,7 +53,7 @@ public class ServerProcessor implements IServerProcessor {
     // @TODO Store hard coded String into constants
     private String createAccount(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
-        Integer balance = Integer.parseInt(transmissionPacket.getProperty(KEY_BALANCE));
+        double balance = Double.parseDouble(transmissionPacket.getProperty(KEY_BALANCE));
         String pin = Bank.getBank().createBalance(accountName, balance);
         Response response;
         if (pin == null) {
@@ -81,7 +81,7 @@ public class ServerProcessor implements IServerProcessor {
     private String checkBalance(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
         String pin = transmissionPacket.getProperty(KEY_PIN);
-        int balance = Bank.getBank().checkBalance(accountName, pin);
+        double balance = Bank.getBank().checkBalance(accountName, pin);
         Response response;
         if (balance > -1) {
             response = buildResponse(RequestType.CHECKBALANCE, transmissionPacket, String.valueOf(balance));

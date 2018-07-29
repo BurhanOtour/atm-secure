@@ -1,17 +1,17 @@
 package de.upb.cs.bibifi.bankapp.data;
 
 public class Account {
-    private int balance;
+    private double balance;
     private String name;
     private String hashedPin;
 
-    public Account(int balance, String name, String hashedPin) {
+    public Account(double balance, String name, String hashedPin) {
         this.balance = balance;
         this.name = name;
         this.hashedPin = hashedPin;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
@@ -23,13 +23,13 @@ public class Account {
         return name;
     }
 
-    public boolean addBalance(int newBalance) {
+    public boolean addBalance(double newBalance) {
         this.balance += newBalance;
         return true;
     }
 
-    public boolean withdrawBalance(int balance) {
-        if (this.balance >= balance && balance > 0) {
+    public boolean withdrawBalance(double balance) {
+        if (this.balance >= balance && balance > 0.0) {
             this.balance -= balance;
             return true;
         } else {
@@ -56,7 +56,7 @@ public class Account {
     public int hashCode() {
         int result = 17;
         result = 31 * result + name.hashCode();
-        result = 31 * result + balance;
+        result = 31 * result + (int)balance;
         result = 31 * result + hashedPin.hashCode();
         return result;
     }

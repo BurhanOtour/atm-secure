@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class Bank implements IBank {
     private String authFile;
 
-    private int currentBalance;
+    private double currentBalance;
 
     private Account currentAccount;
 
@@ -62,7 +62,7 @@ public class Bank implements IBank {
      * @return if the account creation protocol is respected it should return the pin back
      */
     @Override
-    public String createBalance(String acc, int balance) {
+    public String createBalance(String acc, double balance) {
         Account account = accounts.get(acc);
         if (account != null) {
             return null;
@@ -79,7 +79,7 @@ public class Bank implements IBank {
     }
 
     @Override
-    public boolean deposit(String acc, String pin, int balance) {
+    public boolean deposit(String acc, String pin, double balance) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
             return false;
@@ -94,7 +94,7 @@ public class Bank implements IBank {
     }
 
     @Override
-    public boolean withdraw(String acc, String pin, int balance) {
+    public boolean withdraw(String acc, String pin, double balance) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
             return false;
@@ -107,7 +107,7 @@ public class Bank implements IBank {
     }
 
     @Override
-    public int checkBalance(String acc, String pin) {
+    public double checkBalance(String acc, String pin) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
             return -1;
