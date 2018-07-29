@@ -25,7 +25,6 @@ public class Server implements IServer {
     private String authFile = null;
     private int port = 0;
 
-
     //@TODO Add input validation and handling
     public static void main(String[] args) {
         // Handle argument input
@@ -47,7 +46,12 @@ public class Server implements IServer {
         this.serverSocket = new ServerSocket(port);
         this.processor = ServerProcessor.getServerProcessor();
         Bank.getBank().startup(authFile);
+        setUpShutDownHock();
         encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
+    }
+
+    private void setUpShutDownHock() {
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
     }
 
 
@@ -79,7 +83,21 @@ public class Server implements IServer {
         return true;
     }
 
-    public void cleanup(){
+    public void cleanup() {
         // @TODO CLEANUP is a mehtod that would be could upon exists using SIGTERM
+        // stop running threads
+        // store data to DB
+        // close connection to DB
+        // disconnect...
+        // release other resources...
+    }
+
+
+    private class ShutdownHook extends Thread {
+        @Override
+        public void run() {
+            System.out.println("Shutdown Server process is activated");
+            cleanup();
+        }
     }
 }
