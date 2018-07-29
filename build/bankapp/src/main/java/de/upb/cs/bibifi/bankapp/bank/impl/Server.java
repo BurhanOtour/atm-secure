@@ -47,8 +47,8 @@ public class Server implements IServer {
         }
 
         try {
-            IServer server = new Server(Integer.parseInt(commandLine.getOptionValue("p", String.valueOf(AppConstants.DEFAULT_PORT_NUMBER)))
-                    , commandLine.getOptionValue("s", AppConstants.DEFAULT_AUTH_FILE_NAME));
+            IServer server = new Server(Integer.parseInt(commandLine.getOptionValue("port", String.valueOf(AppConstants.DEFAULT_PORT_NUMBER)))
+                    , commandLine.getOptionValue("authfile", AppConstants.DEFAULT_AUTH_FILE_NAME));
             server.start();
         } catch (Exception e) {
             System.out.println(255);
