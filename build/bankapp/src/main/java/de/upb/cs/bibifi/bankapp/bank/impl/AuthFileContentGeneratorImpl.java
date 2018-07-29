@@ -1,7 +1,7 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
 import de.upb.cs.bibifi.bankapp.bank.IAuthFileContentGenerator;
-import de.upb.cs.bibifi.bankapp.constants.AppConstants;
+import de.upb.cs.bibifi.commons.constants.AppConstants;
 import org.json.JSONObject;
 
 import javax.crypto.KeyGenerator;

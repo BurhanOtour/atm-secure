@@ -1,4 +1,4 @@
-package de.upb.cs.bibifi.bankapp.constants;
+package de.upb.cs.bibifi.commons.constants;
 
 public class AppConstants {
     public static final String BANK_CREATION_CONFIRMATION_MESSAGE = "created";

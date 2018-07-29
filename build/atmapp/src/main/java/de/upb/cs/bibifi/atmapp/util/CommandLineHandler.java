@@ -1,9 +1,16 @@
 package de.upb.cs.bibifi.atmapp.util;
 
 import de.upb.cs.bibifi.atmapp.atm.impl.Atm;
+import de.upb.cs.bibifi.atmapp.data.AtmInput;
+import de.upb.cs.bibifi.commons.data.AuthFile;
+import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.validator.Validator;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,82 +18,125 @@ import java.util.Set;
 
 public class CommandLineHandler {
 
-    private static final String CMD_S = "s";
-    private static final String CMD_C = "c";
-    private static final String CMD_A = "a";
-    private static final String CMD_D = "d";
-    private static final String CMD_W = "w";
-    private static final String CMD_N = "n";
-    private static final String CMD_I = "i";
-    private static final String CMD_P = "p";
-    private static final String CMD_G = "g";
+    public static final String CMD_S = "s";
+    public static final String CMD_C = "c";
+    public static final String CMD_A = "a";
+    public static final String CMD_D = "d";
+    public static final String CMD_W = "w";
+    public static final String CMD_N = "n";
+    public static final String CMD_I = "i";
+    public static final String CMD_P = "p";
+    public static final String CMD_G = "g";
 
+    private CommandLine commandLine;
 
     private String[] args = null;
 
+    private TransmissionPacket packet;
+
     public CommandLineHandler(String[] args) {
         this.args = args;
+        init();
     }
 
+    private String cardFileName;
+
     /**
-     * Initialize commandline set-up
+     * Initialize Atm and validate parameters
      */
     public void init() {
+
         CommandLineParser commandLineParser = new DefaultParser();
 
         HelpFormatter formatter = new HelpFormatter();
 
         Options options = new Options();
 
-        Option option = new Option(CMD_A, "initial", true, "initial acount");
-        option.setRequired(true);
-        options.addOption(option);
+        options.addOption(CMD_A, "account", true, "initial acount");
         options.addOption(CMD_S, "auth", true, "authentication file");
         options.addOption(CMD_C, "card", true, "user's bank card");
         options.addOption(CMD_D, "deposit", true, "deposit amount");
         options.addOption(CMD_W, "withdrawal", true, "withdrawal amount");
-        options.addOption(CMD_I, "initial ip", true, "initial ip");
-        options.addOption(CMD_P, "initial port", true, "initial port");
+        options.addOption(CMD_I, "ip", true, "initial ip");
+        options.addOption(CMD_P, "port", true, "initial port");
         options.addOption(CMD_N, "initial", true, "initial balance");
-        options.addOption(CMD_G, "initial balance");
+        options.addOption(CMD_G, "checkbalance");
 
-        CommandLine commandLine = null;
 
         try {
+
             commandLine = commandLineParser.parse(options, args);
+
+            //validate all commandline parameters
+            // applyValidators(commandLine.getOptions());
+
+            // Retrieve the AuthFile Content
+            String key = AuthFile.getAuthFile(commandLine.getOptionValue(CMD_S)).getKey();
+            EncryptionImpl.initialize(key);
+            //ip, port and their default values
+            String ip = commandLine.getOptionValue("ip", "127.0.0.1");
+            Integer port = Integer.parseInt(commandLine.getOptionValue("port", "3000"));
+
+            // this.atm = new Atm(new Client(ip, port));
+
         } catch (ParseException e) {
             e.printStackTrace();
             System.out.println("255");
             System.exit(1);
         }
 
-        processCommandLineArguments(commandLine);
-
     }
 
+    private String readCardFile() {
+        String pin = null;
+        try {
+            pin = EncryptionImpl.getInstance().decryptMessage(FileUtils.readFileToString(new File(commandLine.getOptionValue(CMD_C)), "UTF-8"));
+        } catch (Exception e) {
+            System.out.println(255);
+        }
+        return pin;
+    }
+
+
     /**
-     * Process command line arguments based on given rules
-     *
-     * @param cmdLine
+     * Call businesslogic methods based on input parameters
      */
-    private void processCommandLineArguments(CommandLine cmdLine) {
+    private void setTransmisionPackt(TransmissionPacket packet) {
+        this.packet = packet;
+    }
 
-        Atm atm = new Atm();
+    public TransmissionPacket getPacket() {
+        return packet;
+    }
 
-        Arrays.stream(cmdLine.getOptions()).forEach(option -> {
-
+    public CommandLineHandler processCommandLineArguments() {
+        this.cardFileName = commandLine.getOptionValue(CMD_C);
+        Arrays.stream(commandLine.getOptions()).forEach(option -> {
+            AtmInput input;
             switch (option.getOpt()) {
                 case CMD_N:
-                    applyValidators(cmdLine.getOptions());
-                    atm.createAccount(cmdLine.getOptions());
+                    input = new AtmInput(commandLine, null);
+                    setTransmisionPackt(Atm.createAccount(input));
+                    break;
                 case CMD_D:
-                    applyValidators(cmdLine.getOptions());
-                    atm.deposit(cmdLine.getOptions());
+                    input = new AtmInput(commandLine, readCardFile());
+                    setTransmisionPackt(Atm.deposit(input));
+                    break;
                 case CMD_W:
-                    applyValidators(cmdLine.getOptions());
-                    atm.withdraw(cmdLine.getOptions());
+                    input = new AtmInput(commandLine, readCardFile());
+                    setTransmisionPackt(Atm.withdraw(input));
+                    break;
+                case CMD_G:
+                    input = new AtmInput(commandLine, readCardFile());
+                    setTransmisionPackt(Atm.checkBalance(input));
+                    break;
             }
         });
+        return this;
+    }
+
+    public String getCardFileName() {
+        return cardFileName;
     }
 
     /**
@@ -111,18 +161,25 @@ public class CommandLineHandler {
                 case CMD_W:
                     if (!validator.validateNumerals(option.getValue()))
                         fail();
+                    break;
                 case CMD_I:
                     if (!validator.validateIP(option.getValue()))
                         fail();
+                    break;
                 case CMD_P:
                     if (!validator.validatePort(option.getValue()))
                         fail();
+                    break;
                 case CMD_C:
                     if (!validator.validateFileName(option.getValue()))
                         fail();
+                    break;
                 case CMD_A:
-                    if (!validator.validateAccountName((option.getValue()))) ;
-                    fail();
+                    if (!validator.validateAccountName((option.getValue())))
+                        fail();
+                    break;
+                default:
+                    break;
             }
         });
     }
@@ -131,7 +188,7 @@ public class CommandLineHandler {
      * Exit application by displaying en error code.
      */
     private void fail() {
-        System.out.print("255");
+        System.out.print(255);
         System.exit(1);
     }
 }

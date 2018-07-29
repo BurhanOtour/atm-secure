@@ -1,31 +1,35 @@
 package de.upb.cs.bibifi.atmapp.atm.impl;
 
-import de.upb.cs.bibifi.atmapp.atm.IATM;
-import org.apache.commons.cli.Option;
+import de.upb.cs.bibifi.atmapp.atm.RequestProcessor;
+import de.upb.cs.bibifi.atmapp.data.AtmInput;
+import de.upb.cs.bibifi.atmapp.util.CommandLineHandler;
+import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import de.upb.cs.bibifi.commons.enums.RequestType;
 
-public class Atm implements IATM {
+public class Atm {
 
-    public Atm() {
+
+    public static TransmissionPacket createAccount(AtmInput input) {
+        return RequestProcessor.generateRequest(
+                RequestType.CREATE, input.getCommandLine().getOptionValue(CommandLineHandler.CMD_A),
+                Integer.parseInt(input.getCommandLine().getOptionValue(CommandLineHandler.CMD_N)), null);
     }
 
-    @Override
-    public void createAccount(Option[] params) {
-        
-
+    public static TransmissionPacket deposit(AtmInput input) {
+        return RequestProcessor.generateRequest(
+                RequestType.DEPOSIT, input.getCommandLine().getOptionValue(CommandLineHandler.CMD_A),
+                Integer.parseInt(input.getCommandLine().getOptionValue(CommandLineHandler.CMD_D)), input.getPIN());
     }
 
-    @Override
-    public void deposit(Option[] params) {
-
+    public static TransmissionPacket withdraw(AtmInput input) {
+        return RequestProcessor.generateRequest(
+                RequestType.WITHDRAW, input.getCommandLine().getOptionValue(CommandLineHandler.CMD_A),
+                Integer.parseInt(input.getCommandLine().getOptionValue(CommandLineHandler.CMD_W)), input.getPIN());
     }
 
-    @Override
-    public void withdraw(Option[] params) {
-
-    }
-
-    @Override
-    public void checkBalance(Option[] params) {
-
+    public static TransmissionPacket checkBalance(AtmInput input) {
+        return RequestProcessor.generateRequest(
+                RequestType.CHECKBALANCE, input.getCommandLine().getOptionValue(CommandLineHandler.CMD_A),
+                0, input.getPIN());
     }
 }

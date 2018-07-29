@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 
 public class Utilities {
@@ -24,12 +25,12 @@ public class Utilities {
     }
 
     public static InputStream convertString(String str) {
-        byte[] array = str.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] array = Base64.getDecoder().decode(str);
         return new ByteArrayInputStream(array);
     }
 
     public static String convertOutputStream(OutputStream outputStream) {
         byte[] array = ((ByteArrayOutputStream) outputStream).toByteArray();
-        return new String(array, StandardCharsets.ISO_8859_1);
+        return Base64.getEncoder().encodeToString(array);
     }
 }

@@ -1,17 +1,21 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
+import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.bankapp.bank.IServer;
 import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
-import de.upb.cs.bibifi.bankapp.constants.AppConstants;
+import de.upb.cs.bibifi.commons.constants.AppConstants;
 import de.upb.cs.bibifi.commons.IEncryption;
 import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 
 public class Server implements IServer {
@@ -22,7 +26,6 @@ public class Server implements IServer {
     private IEncryption encryption;
     private String authFile = null;
     private int port = 0;
-
 
     //@TODO Add input validation and handling
     public static void main(String[] args) {
@@ -45,22 +48,40 @@ public class Server implements IServer {
         this.serverSocket = new ServerSocket(port);
         this.processor = ServerProcessor.getServerProcessor();
         Bank.getBank().startup(authFile);
+        setUpShutDownHock();
         encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
     }
+
+    private void setUpShutDownHock() {
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+    }
+
 
     @Override
     public void start() throws Exception {
         while (true) {
+            //Open Socket for accepting request
             Socket sock = serverSocket.accept();
             OutputStream out = sock.getOutputStream();
             PrintWriter print = new PrintWriter(out, true);
-            InputStream is = sock.getInputStream();
-            IEncryption e = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
-            String json = e.decryptMessage(is);
+
+            InputStream istream = sock.getInputStream();
+            BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+            String receiveMessage,decryptMsg = null;
+
+            //Receive msg and decrypt the message
+            if ((receiveMessage = receiveRead.readLine()) != null) {
+                decryptMsg = encryption.decryptMessage(receiveMessage);
+                System.out.println(decryptMsg);
+            }
+
+            //Take decrypted msg and make pkt
+            String json = decryptMsg.toString();
             TransmissionPacket requestPkt = Utilities.deserializer(json);
             if (validTransmission(requestPkt)) {
-                String resStream = processor.executeOperation(requestPkt);
-                print.println(encryption.encryptMessage(resStream));
+                String resJson = processor.executeOperation(requestPkt);
+                String response = encryption.encryptMessage(resJson);
+                print.println(response);
                 print.flush();
             } else {
                 continue;
@@ -70,5 +91,22 @@ public class Server implements IServer {
 
     private boolean validTransmission(TransmissionPacket packet) {
         return true;
+    }
+
+
+    public void cleanup() throws IOException {
+        FileUtils.forceDelete(new File(authFile));
+    }
+
+
+    private class ShutdownHook extends Thread {
+        @Override
+        public void run() {
+            try {
+                cleanup();
+            } catch (IOException e) {
+                System.out.println(255);
+            }
+        }
     }
 }

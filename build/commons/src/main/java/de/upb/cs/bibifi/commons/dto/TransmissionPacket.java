@@ -11,8 +11,6 @@ public class TransmissionPacket {
 
     private HashMap<String, String> properties;
 
-    private Status status;
-
     public RequestType getRequestType() {
         return requestType;
     }
@@ -38,18 +36,4 @@ public class TransmissionPacket {
             properties = new HashMap<>();
         properties.put(key, value);
     }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setStatus(Integer statusCode, String msg) {
-        status.setMessage(msg);
-        status.setStatusCode(statusCode);
-    }
-
 }

@@ -1,7 +1,11 @@
 package de.upb.cs.bibifi.atmapp;
 
+import de.upb.cs.bibifi.commons.IEncryption;
+import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+
 import java.io.IOException;
 
 interface IClient {
-    String clientRequest (String msg) throws IOException;
+    //Client(ip, port)
+    void clientRequest (TransmissionPacket request) throws IOException, Exception;
 }
