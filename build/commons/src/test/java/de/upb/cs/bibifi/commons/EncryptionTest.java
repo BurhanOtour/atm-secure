@@ -20,15 +20,9 @@ public class EncryptionTest {
         String key = "PrvQH+6bvZPJrqR02ntOFw";
         IEncryption encryption = EncryptionImpl.initialize(key);
 
-        OutputStream outStreamEnc = encryption.encryptMessage(helloMessage);
-        InputStream inputStreamDec = new ByteArrayInputStream(((ByteArrayOutputStream) outStreamEnc).toByteArray());
-
-        String decodedString = encryption.decryptMessage(inputStreamDec);
-
-        String encryptedString = Utilities.convertOutputStream(encryption.encryptMessage(helloMessage));
-        String decryptedString = encryption.decryptMessage(Utilities.convertString(encryptedString));
+        String encryptedString = encryption.encryptMessage(helloMessage);
+        String decryptedString = encryption.decryptMessage(encryptedString);
 
         assertEquals(helloMessage, decryptedString);
-        assertEquals(helloMessage, decodedString);
     }
 }

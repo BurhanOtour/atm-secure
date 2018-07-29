@@ -15,7 +15,7 @@ public interface IEncryption {
 	 * @param message The message which should be encrypted
 	 * @return  outputStream  The output stream which should receive the encrypted representable
 	 */
-	  OutputStream encryptMessage(String message) throws IOException;
+	  String encryptMessage(String message) throws IOException;
 
 	/**
 	 * Deserialize a representable by decrypting it from an input stream
@@ -24,5 +24,5 @@ public interface IEncryption {
 	 *
 	 * @return The Representation which was read and decrypted from the input stream
 	 */
-	  String decryptMessage(InputStream inputStream) throws IOException;
+	  String decryptMessage(String inputStream) throws IOException;
 }

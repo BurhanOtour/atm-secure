@@ -69,7 +69,7 @@ public class Server implements IServer {
 
             //Receive msg and decrypt the message
             if ((receiveMessage = receiveRead.readLine()) != null) {
-                decryptMsg = encryption.decryptMessage(Utilities.convertString(receiveMessage));
+                decryptMsg = encryption.decryptMessage(receiveMessage);
                 System.out.println(decryptMsg);
             }
 
@@ -78,8 +78,8 @@ public class Server implements IServer {
             TransmissionPacket requestPkt = Utilities.deserializer(json);
             if (validTransmission(requestPkt)) {
                 String resJson = processor.executeOperation(requestPkt);
-                String response = Utilities.convertOutputStream(encryption.encryptMessage(resJson));
-                print.println(resJson);
+                String response = encryption.encryptMessage(resJson);
+                print.println(response);
                 print.flush();
             } else {
                 continue;

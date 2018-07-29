@@ -29,16 +29,14 @@ public class Client implements IClient {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
         //Encrypt the json request and send it to socket
-        String encyptString = Utilities.convertOutputStream(encryption.encryptMessage(jsonRequest));
+        String encyptString = encryption.encryptMessage(jsonRequest);
         printWriter.println(encyptString);
 
         //Receive the response
         String receivedMessge;
         if((receivedMessge = br.readLine())!=null){
-            System.out.println(receivedMessge);
-
             //Decrypt the message
-            String response = encryption.decryptMessage(Utilities.convertString(receivedMessge));
+            String response = encryption.decryptMessage(receivedMessge);
             Gson gson = new Gson();
             CreationResponse responseObject = gson.fromJson(response, CreationResponse.class);
             System.out.println(responseObject.getMessage());
