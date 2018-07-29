@@ -64,23 +64,19 @@ public class Client implements IClient {
             }
             if (responseObject.getCode() == 255 || responseObject.getCode() == 67) {
                 System.out.println(responseObject.getCode());
+                System.exit(255);
                 return;
             }
             if (responseObject.getCode() == 0) {
                 if (request.getRequestType() == RequestType.CREATE) {
                     CreationResponse responseCreationObject = (CreationResponse) responseObject;
-                    System.out.println(responseCreationObject.getPin());
                     savePin(responseCreationObject.getPin());
                 }
                 System.out.println(responseObject.getMessage());
                 printWriter.flush();
                 sock.close();
                 return;
-            } else {
-                System.out.println(responseObject.getCode());
-                return;
             }
-
         }
     }
 
