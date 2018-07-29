@@ -1,5 +1,6 @@
 package de.upb.cs.bibifi.commons.validator;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -28,9 +29,14 @@ public class Validator {
      */
     public boolean validateNumerals(String numeral) {
         double max_amount = 4294967295.99;
-        double amount = Double.valueOf(numeral);
+        double amount = 0;
         Pattern pattern = Pattern.compile("^(0|[1-9][0-9]*)\\.\\d{2}|([1-9][0-9]*)$");
-        return numeral.matches(pattern.pattern()) ? amount < max_amount : false;
+        try {
+            amount = Double.parseDouble(numeral);
+        } catch (NumberFormatException e) {
+
+        }
+        return numeral.matches(pattern.pattern()) ? amount <= max_amount : false;
     }
 
     /**
@@ -40,9 +46,8 @@ public class Validator {
      * @return
      */
     public boolean validateIP(String ipString) {
-        //Pattern pattern = Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
         Pattern pattern = Pattern.compile(
-                "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+            "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
         return pattern.matcher(ipString).matches();
     }
 
@@ -55,13 +60,13 @@ public class Validator {
     public boolean validatePort(String portString) {
         int min_num = 1024;
         int max_num = 65535;
-        int amount = Integer.valueOf(portString);
-        Pattern pattern = Pattern.compile("^(102[4-9]|10[3-9][0-9]|1[1-9][0-9]{2}|[2-9][0-9]{3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
-        boolean b = false;
-        if (amount > min_num && amount < max_num) {
-            b = portString.matches(pattern.pattern());
+        int amount = 0;
+        try {
+            amount = Integer.parseInt(portString);
+        } catch (NumberFormatException e) {
+
         }
-        return b;
+        return amount >= min_num && amount <= max_num ? true : false ;
     }
 
     /**
@@ -71,8 +76,8 @@ public class Validator {
      * @return
      */
     public boolean validateFileName(String fileName) {
-        Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+[^.]|[^.][_\\-\\.0-9a-z]+|[_\\-\\.0-9a-z][^.][_\\-\\.0-9a-z]$");
-        return fileName.length() < 128 ? pattern.matcher(fileName).matches() : false;
+        Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
+        return (fileName.length() <= 127 && !fileName.equals(".")  && !fileName.equals("..") )  ? pattern.matcher(fileName).matches() : false;
     }
 
     /**
@@ -83,7 +88,7 @@ public class Validator {
      */
     public boolean validateAccountName(String accountName) {
         Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
-        return accountName.length() < 123 ? pattern.matcher(accountName).matches() : false;
+        return accountName.length() <= 122 ? pattern.matcher(accountName).matches() : false;
     }
 
     /**
@@ -93,8 +98,13 @@ public class Validator {
      * @return
      */
     public boolean validateInitialBalance(String initialBalance) {
-        int amount = Integer.valueOf(initialBalance);
-        return amount > 10 ? true : false;
+        double amount = 0;
+        try {
+            amount = Double.parseDouble(initialBalance);
+        } catch (NumberFormatException e) {
+
+        }
+        return amount >= 10.0 ? true : false;
     }
 
     /**
@@ -115,14 +125,26 @@ public class Validator {
         operations.add(CMD_W);
         operations.add(CMD_N);
         operations.add(CMD_G);
+
         boolean match = false;
-        for (String s : options) {
-            if (operations.contains(s) && match != true) {
+        for (String str : operations) {
+            if (options.contains(str) && match != true) {
                 match = true;
-            }else if (operations.contains(s) && match == true){
+            }else if (options.contains(str) && match == true){
                 match = false;
+                break;
             }
         }
         return match;
+    }
+
+    /**
+     * Check regex validation for File names
+     *
+     * @param args
+     * @return
+     */
+    public boolean validateArgumentLength( String[] args) {
+        return  !Arrays.stream(args).anyMatch(arg->arg.length()>4096);
     }
 }
