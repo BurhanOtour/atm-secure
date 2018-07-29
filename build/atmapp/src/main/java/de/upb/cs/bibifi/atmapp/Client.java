@@ -21,14 +21,21 @@ import java.nio.charset.StandardCharsets;
 public class Client implements IClient {
 
     private String cardFileName;
+    private String ip;
+    private Integer port;
 
-    public Client(String cardFileName){
+    public Client(String cardFileName, String ip, Integer port) {
         this.cardFileName = cardFileName;
+        this.ip = ip;
+        this.port = port;
+
     }
+
     public void clientRequest(TransmissionPacket request) throws Exception {
+
         String jsonRequest = Utilities.Serializer(request);
 
-        Socket sock = new Socket("127.0.0.1", 3000);
+        Socket sock = new Socket(ip, port);
 
         OutputStream outputStream = sock.getOutputStream();
 
@@ -79,17 +86,17 @@ public class Client implements IClient {
 
     private void savePin(String pin) throws Exception {
         File file = new File(cardFileName);
-        if(file.exists()){
+        if (file.exists()) {
             System.out.println(255);
             System.exit(-1);
         }
-        FileUtils.writeStringToFile(file, EncryptionImpl.getInstance().encryptMessage(pin),"UTF-8");
+        FileUtils.writeStringToFile(file, EncryptionImpl.getInstance().encryptMessage(pin), "UTF-8");
     }
 
     public static void main(String[] args) throws IOException {
         CommandLineHandler commandLineHandler = new CommandLineHandler(args);
         TransmissionPacket packet = commandLineHandler.processCommandLineArguments().getPacket();
-        Client client = new Client(commandLineHandler.getCardFileName());
+        Client client = new Client(commandLineHandler.getCardFileName(), commandLineHandler.getIp(), commandLineHandler.getPort());
         try {
             client.clientRequest(packet);
         } catch (Exception e) {

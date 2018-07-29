@@ -30,7 +30,7 @@ public class Validator {
     public boolean validateNumerals(String numeral) {
         double max_amount = 4294967295.99;
         double amount = 0;
-        Pattern pattern = Pattern.compile("^(0|[1-9][0-9]*)\\.\\d{2}|([1-9][0-9]*)$");
+        Pattern pattern = Pattern.compile("^(0|[1-9][0-9]*)\\.\\d{2}$");
         try {
             amount = Double.parseDouble(numeral);
         } catch (NumberFormatException e) {
@@ -88,7 +88,7 @@ public class Validator {
      */
     public boolean validateAccountName(String accountName) {
         Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
-        return accountName.length() <= 122 ? pattern.matcher(accountName).matches() : false;
+        return accountName.length() < 123 ? pattern.matcher(accountName).matches() : false;
     }
 
     /**
