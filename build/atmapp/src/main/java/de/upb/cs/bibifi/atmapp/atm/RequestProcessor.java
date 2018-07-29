@@ -6,7 +6,7 @@ import de.upb.cs.bibifi.commons.enums.RequestType;
 
 // @TODO Build a factory
 public class RequestProcessor {
-    public static TransmissionPacket generateRequest(RequestType type, String account, int balance, String pin) {
+    public static TransmissionPacket generateRequest(RequestType type, String account, double balance, String pin) {
         TransmissionPacket packet = new TransmissionPacket();
         switch (type) {
             case CREATE:
