@@ -93,7 +93,7 @@ public class CommandLineHandler {
 
         } catch (ParseException e) {
             e.printStackTrace();
-            System.out.println(255);
+            System.exit(255);
             System.exit(1);
         }
 
@@ -104,7 +104,7 @@ public class CommandLineHandler {
         try {
             pin = EncryptionImpl.getInstance().decryptMessage(FileUtils.readFileToString(new File(commandLine.getOptionValue(CMD_C)), "UTF-8"));
         } catch (Exception e) {
-            System.out.println(255);
+            System.exit(255);
         }
         return pin;
     }
@@ -221,7 +221,6 @@ public class CommandLineHandler {
      * Exit application by displaying en error code.
      */
     private void fail() {
-        System.out.print(255);
-        System.exit(1);
+        System.exit(255);
     }
 }
