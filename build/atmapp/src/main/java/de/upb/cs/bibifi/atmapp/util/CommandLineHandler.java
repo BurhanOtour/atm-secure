@@ -24,11 +24,14 @@ public class CommandLineHandler {
 
     private Atm atm = null;
 
-
     private String[] args = null;
+
+    Validator validator = new Validator();
 
     public CommandLineHandler(String[] args) {
         this.args = args;
+        if (!validator.validateArgumentLength(args))
+            fail();
     }
 
     /**
@@ -42,7 +45,9 @@ public class CommandLineHandler {
 
         Options options = new Options();
 
-        options.addOption(CMD_A, "initial", true, "initial acount");
+        Option option = new Option(CMD_A, "initial", true, "initial acount");
+        option.setRequired(true);
+        options.addOption(option);
         options.addOption(CMD_S, "auth", true, "authentication file");
         options.addOption(CMD_C, "card", true, "user's bank card");
         options.addOption(CMD_D, "deposit", true, "deposit amount");
@@ -50,7 +55,7 @@ public class CommandLineHandler {
         options.addOption(CMD_I, "ip", true, "initial ip");
         options.addOption(CMD_P, "port", true, "initial port");
         options.addOption(CMD_N, "initial", true, "initial balance");
-        options.addOption(CMD_G, "checkbalance");
+        options.addOption(CMD_G, "check balance");
 
         CommandLine commandLine = null;
 
@@ -63,18 +68,14 @@ public class CommandLineHandler {
 
             //ip, port and their default values
             String ip = commandLine.getOptionValue("ip", "127.0.0.1");
-            Integer port = Integer.parseInt(commandLine.getOptionValue("port", "25001"));
+            Integer port = Integer.parseInt(commandLine.getOptionValue("port", "3000"));
 
-           // this.atm = new Atm(new Client(ip, port));
+            this.atm = new Atm(new Client());
 
-        } catch (ParseException e) {
-            e.printStackTrace();
-            System.out.println("255");
-            System.exit(1);
+        } catch (ParseException ex ) {
+            fail();
         }
-
         processCommandLineArguments(commandLine);
-
     }
 
     /**
@@ -83,6 +84,16 @@ public class CommandLineHandler {
      * @param cmdLine
      */
     private void processCommandLineArguments(CommandLine cmdLine) {
+
+        Option[] options = cmdLine.getOptions();
+        Set<String> opts = new HashSet<>();
+
+        Arrays.stream(cmdLine.getOptions()).forEach(option -> {
+            opts.add(option.getOpt());
+        });
+        if (!validator.checkOperations(opts)) {
+            fail();
+        }
 
         Arrays.stream(cmdLine.getOptions()).forEach(option -> {
 
@@ -105,8 +116,6 @@ public class CommandLineHandler {
      */
     private void applyValidators(Option[] options) {
 
-        Validator validator = new Validator();
-
         Set<String> duplicateOptionsSet = new HashSet<>();
 
         Arrays.stream(options).forEach(option -> {
@@ -115,6 +124,9 @@ public class CommandLineHandler {
 
             switch (option.getOpt()) {
                 case CMD_N:
+                    if (!validator.validateNumerals(option.getValue()) || !validator.validateInitialBalance(option.getValue()))
+                        fail();
+                    break;
                 case CMD_D:
                 case CMD_W:
                     if (!validator.validateNumerals(option.getValue()))
@@ -129,13 +141,13 @@ public class CommandLineHandler {
                         fail();
                     break;
                 case CMD_C:
+                case CMD_S:
                     if (!validator.validateFileName(option.getValue()))
                         fail();
                     break;
                 case CMD_A:
-                    if (!validator.validateAccountName((option.getValue())))
+                    if (!validator.validateAccountName(option.getValue()))
                         fail();
-                    break;
                 default:
                     break;
             }
