@@ -84,7 +84,7 @@ public class ServerProcessor implements IServerProcessor {
         int balance = Bank.getBank().checkBalance(accountName, pin);
         Response response;
         if (balance > -1) {
-            response = buildResponse(RequestType.DEPOSIT, transmissionPacket, null);
+            response = buildResponse(RequestType.CHECKBALANCE, transmissionPacket, String.valueOf(balance));
         } else {
             response = new Response("", 255);
         }
