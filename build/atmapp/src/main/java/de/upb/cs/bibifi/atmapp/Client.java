@@ -1,35 +1,53 @@
 package de.upb.cs.bibifi.atmapp;
 
+import com.google.gson.Gson;
+import de.upb.cs.bibifi.atmapp.atm.RequestProcessor;
+import de.upb.cs.bibifi.commons.IEncryption;
+import de.upb.cs.bibifi.commons.data.AuthFile;
+import de.upb.cs.bibifi.commons.dto.CreationResponse;
+import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import de.upb.cs.bibifi.commons.enums.RequestType;
+import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
+import de.upb.cs.bibifi.commons.impl.Utilities;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.net.Socket;
 
 public class Client implements IClient {
-    private String ipAddress = null;
-    private int port = 0;
 
-    public Client (String ip, int port){
-        ipAddress = ip;
-        this.port = port;
+
+    public void clientRequest(TransmissionPacket request, String authFileName) throws IOException {
+
+        String jsonRequest = Utilities.Serializer(request);
+       // IEncryption encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(authFileName).getKey());
+        
+        Socket sock = new Socket("127.0.0.1", 3000);
+        OutputStream outputStream = sock.getOutputStream();
+        PrintWriter printWriter = new PrintWriter(outputStream, true);
+        InputStream inputStream = sock.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        printWriter.println(jsonRequest);
+
+        String receivedMessge;
+        if((receivedMessge = br.readLine())!=null){
+            System.out.println(receivedMessge);
+            Gson gson = new Gson();
+            CreationResponse responseObject = gson.fromJson(receivedMessge, CreationResponse.class);
+            System.out.println(responseObject.getMessage());
+            printWriter.flush();
+            sock.close();
+            return;
+        }
+    //    String response = encryption.decryptMessage(inputStream);
+
+
     }
 
-    @Override
-    public String clientRequest(String msg) throws IOException {
-        Socket sock = new Socket(ipAddress, 25000);
-        BufferedReader keyRead = new BufferedReader(new InputStreamReader(System.in));
-        OutputStream ostream = sock.getOutputStream();
-        PrintWriter pwrite = new PrintWriter(ostream, true);
-        InputStream istream = sock.getInputStream();
-        BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-
-        String receiveMessage, sendMessage;
-        while (true) {
-            sendMessage = msg;
-            pwrite.println(sendMessage);
-            pwrite.flush();
-            if ((receiveMessage = receiveRead.readLine()) != null) {
-                sock.close();
-                return receiveMessage;
-            }
-        }
+    public static void main(String[] args) throws IOException{
+        RequestProcessor processor = new RequestProcessor();
+        TransmissionPacket packet = processor.generateRequest(RequestType.CREATE, "dummy",12,null);
+        Client client = new Client();
+        client.clientRequest(packet,"bank.auth");
     }
 }

@@ -1,7 +1,7 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
 import de.upb.cs.bibifi.bankapp.bank.IBank;
-import de.upb.cs.bibifi.bankapp.constants.AppConstants;
+import de.upb.cs.bibifi.commons.constants.AppConstants;
 import de.upb.cs.bibifi.bankapp.data.Account;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;

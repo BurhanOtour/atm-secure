@@ -67,7 +67,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>de.upb.cs.bibifi.atmapp.Main</mainClass>
+                            <mainClass>de.upb.cs.bibifi.atmapp.Client</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

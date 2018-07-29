@@ -3,7 +3,7 @@ package de.upb.cs.bibifi.bankapp.bank.impl;
 import com.google.gson.Gson;
 import de.upb.cs.bibifi.bankapp.bank.IAuthFileContentGenerator;
 import de.upb.cs.bibifi.bankapp.bank.IBank;
-import de.upb.cs.bibifi.bankapp.constants.AppConstants;
+import de.upb.cs.bibifi.commons.constants.AppConstants;
 import de.upb.cs.bibifi.bankapp.data.Account;
 import de.upb.cs.bibifi.bankapp.exceptions.SystemException;
 import de.upb.cs.bibifi.commons.data.AuthFile;

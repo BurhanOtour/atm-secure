@@ -2,16 +2,18 @@ package de.upb.cs.bibifi.bankapp.bank.impl;
 
 import de.upb.cs.bibifi.bankapp.bank.IServer;
 import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
-import de.upb.cs.bibifi.bankapp.constants.AppConstants;
+import de.upb.cs.bibifi.commons.constants.AppConstants;
 import de.upb.cs.bibifi.commons.IEncryption;
 import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 
 public class Server implements IServer {
@@ -22,7 +24,6 @@ public class Server implements IServer {
     private IEncryption encryption;
     private String authFile = null;
     private int port = 0;
-
 
     //@TODO Add input validation and handling
     public static void main(String[] args) {
@@ -45,8 +46,14 @@ public class Server implements IServer {
         this.serverSocket = new ServerSocket(port);
         this.processor = ServerProcessor.getServerProcessor();
         Bank.getBank().startup(authFile);
+        setUpShutDownHock();
         encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
     }
+
+    private void setUpShutDownHock() {
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+    }
+
 
     @Override
     public void start() throws Exception {
@@ -54,13 +61,17 @@ public class Server implements IServer {
             Socket sock = serverSocket.accept();
             OutputStream out = sock.getOutputStream();
             PrintWriter print = new PrintWriter(out, true);
-            InputStream is = sock.getInputStream();
-            IEncryption e = EncryptionImpl.initialize(AuthFile.getAuthFile(this.authFile).getKey());
-            String json = e.decryptMessage(is);
+            InputStream istream = sock.getInputStream();
+            BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+            String receiveMessage;
+            if ((receiveMessage = receiveRead.readLine()) != null) {
+                System.out.println(receiveMessage);
+            }
+            String json = receiveMessage.toString();
             TransmissionPacket requestPkt = Utilities.deserializer(json);
             if (validTransmission(requestPkt)) {
                 String resStream = processor.executeOperation(requestPkt);
-                print.println(encryption.encryptMessage(resStream));
+                print.println(resStream);
                 print.flush();
             } else {
                 continue;
@@ -70,5 +81,23 @@ public class Server implements IServer {
 
     private boolean validTransmission(TransmissionPacket packet) {
         return true;
+    }
+
+    public void cleanup() {
+        // @TODO CLEANUP is a mehtod that would be could upon exists using SIGTERM
+        // stop running threads
+        // store data to DB
+        // close connection to DB
+        // disconnect...
+        // release other resources...
+    }
+
+
+    private class ShutdownHook extends Thread {
+        @Override
+        public void run() {
+            System.out.println("Shutdown Server process is activated");
+            cleanup();
+        }
     }
 }

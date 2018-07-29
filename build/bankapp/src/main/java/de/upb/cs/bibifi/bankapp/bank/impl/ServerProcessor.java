@@ -4,13 +4,12 @@ import com.google.gson.Gson;
 import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
 import de.upb.cs.bibifi.commons.dto.CreationResponse;
 import de.upb.cs.bibifi.commons.dto.Response;
-import de.upb.cs.bibifi.commons.dto.Status;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.enums.RequestType;
-import de.upb.cs.bibifi.commons.impl.Utilities;
 import org.json.JSONObject;
 
-import static de.upb.cs.bibifi.bankapp.constants.AppConstants.*;
+import static de.upb.cs.bibifi.commons.constants.AppConstants.*;
+
 
 public class ServerProcessor implements IServerProcessor {
 
@@ -28,20 +27,6 @@ public class ServerProcessor implements IServerProcessor {
         return processor;
     }
 
-    private String processRequest(String requestBody) throws Exception {
-        TransmissionPacket transmissionPacket = Utilities.deserializer(requestBody);
-        return executeOperation(transmissionPacket);
-    }
-
-    private TransmissionPacket createAccountPacket(String accountName, Integer balance, String pin, Status status) {
-        TransmissionPacket packet = new TransmissionPacket();
-        packet.setProperty("pin", pin);
-        packet.setProperty("balance", balance.toString());
-        packet.setProperty("accountName", accountName);
-        packet.setRequestType(RequestType.CREATE);
-        packet.setStatus(status);
-        return packet;
-    }
 
     // Validate TransmissionPacket before injecting it here!
     public String executeOperation(TransmissionPacket transmissionPacket) {

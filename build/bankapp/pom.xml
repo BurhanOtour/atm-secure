@@ -96,7 +96,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>de.upb.cs.bibifi.bankapp.Main</mainClass>
+                            <mainClass>de.upb.cs.bibifi.bankapp.bank.impl.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
