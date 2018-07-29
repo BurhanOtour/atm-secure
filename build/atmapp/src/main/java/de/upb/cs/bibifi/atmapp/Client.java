@@ -22,6 +22,7 @@ public class Client implements IClient {
 
     public void clientRequest(TransmissionPacket request, String authFileName) throws IOException {
         String jsonRequest = Utilities.Serializer(request);
+
         IEncryption encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(authFileName).getKey());
 
         Socket sock = new Socket("127.0.0.1", 3000);
@@ -30,8 +31,13 @@ public class Client implements IClient {
         InputStream inputStream = sock.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
+        String encryptString = encryption.encryptMessage(jsonRequest);
+        printWriter.println(encryptString);
+
+        //Receive Response
         String receivedMessage;
         if ((receivedMessage = br.readLine()) != null) {
+            receivedMessage = encryption.decryptMessage(receivedMessage);
             Gson gson = new Gson();
             Response responseObject;
             if (request.getRequestType() == RequestType.CREATE) {
@@ -39,12 +45,12 @@ public class Client implements IClient {
             } else {
                 responseObject = gson.fromJson(receivedMessage, Response.class);
             }
-            if(responseObject.getCode()==255 || responseObject.getCode()==67){
+            if (responseObject.getCode() == 255 || responseObject.getCode() == 67) {
                 System.out.println(responseObject.getCode());
                 return;
             }
-            if(responseObject.getCode()==0){
-                if(request.getRequestType()==RequestType.CREATE){
+            if (responseObject.getCode() == 0) {
+                if (request.getRequestType() == RequestType.CREATE) {
                     CreationResponse responseCreationObject = (CreationResponse) responseObject;
                     System.out.println(responseCreationObject.getPin());
                     savePin(responseCreationObject.getPin());
@@ -53,24 +59,20 @@ public class Client implements IClient {
                 printWriter.flush();
                 sock.close();
                 return;
-            }else{
+            } else {
                 System.out.println(responseObject.getCode());
                 return;
             }
 
         }
-        //    String response = encryption.decryptMessage(inputStream);
-
-
     }
 
     private void savePin(String pin) {
-
     }
 
     public static void main(String[] args) throws IOException {
         CommandLineHandler commandLineHandler = new CommandLineHandler(args);
-        TransmissionPacket packet = RequestProcessor.generateRequest(RequestType.CREATE, "dummy5", 9, "4270");
+        TransmissionPacket packet = RequestProcessor.generateRequest(RequestType.CHECKBALANCE, "dummy5", 5, "3250");
         Client client = new Client();
         client.clientRequest(packet, "bank.auth");
     }
