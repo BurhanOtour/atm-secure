@@ -43,24 +43,22 @@ public class EncryptionImpl implements IEncryption {
         return singleton;
     }
 
-    public OutputStream encryptMessage(String message) throws IOException {
+    public String encryptMessage(String message) throws IOException {
         try {
-            OutputStream outputStream = new ByteArrayOutputStream();
             SecretKey secKey = new SecretKeySpec(key, algoName);
             Cipher aes = Cipher.getInstance(transformation);
             aes.init(Cipher.ENCRYPT_MODE, secKey, new IvParameterSpec(key));
             byte[] encryptedArray = aes.doFinal(message.getBytes());
-            outputStream.write(encryptedArray);
-            return outputStream;
+            return Base64.getEncoder().encodeToString(encryptedArray);
         } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | BadPaddingException |
                 InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException ex) {
-            throw new IOException("Error happened with encryption the message",ex);
+            throw new IOException("Error happened with encryption the message");
         }
     }
 
-    public String decryptMessage(InputStream inputStream) throws IOException {
+    public String decryptMessage(String string) throws IOException {
         try {
-            byte[] encryptedArray = readBytes(inputStream);
+            byte[] encryptedArray = Base64.getDecoder().decode(string);
             SecretKey secKey = new SecretKeySpec(key, algoName);
             Cipher aes = Cipher.getInstance(transformation);
             aes.init(Cipher.DECRYPT_MODE, secKey, new IvParameterSpec(key));
@@ -68,16 +66,7 @@ public class EncryptionImpl implements IEncryption {
             return new String(decryptedBytes);
         } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | BadPaddingException |
                 InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException ex) {
-            throw new IOException("Error happened with decryption the message", ex);
+            throw new IOException("Error happened with decryption the message");
         }
-    }
-
-    public static byte[] readBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1];
-        for (int len = inputStream.read(buffer); len != -1; len = inputStream.read(buffer)) {
-            os.write(buffer, 0, len);
-        }
-        return os.toByteArray();
     }
 }
