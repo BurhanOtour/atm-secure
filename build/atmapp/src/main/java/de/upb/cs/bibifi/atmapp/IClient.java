@@ -7,5 +7,5 @@ import java.io.IOException;
 
 interface IClient {
     //Client(ip, port)
-    void clientRequest (TransmissionPacket request, String authFileName) throws IOException;
+    void clientRequest (TransmissionPacket request) throws IOException, Exception;
 }

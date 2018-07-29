@@ -11,6 +11,7 @@ import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.enums.RequestType;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -19,19 +20,28 @@ import java.nio.charset.StandardCharsets;
 
 public class Client implements IClient {
 
+    private String cardFileName;
 
-    public void clientRequest(TransmissionPacket request, String authFileName) throws IOException {
+    public Client(String cardFileName){
+        this.cardFileName = cardFileName;
+    }
+    public void clientRequest(TransmissionPacket request) throws Exception {
         String jsonRequest = Utilities.Serializer(request);
 
-        IEncryption encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(authFileName).getKey());
-
         Socket sock = new Socket("127.0.0.1", 3000);
+
         OutputStream outputStream = sock.getOutputStream();
+
         PrintWriter printWriter = new PrintWriter(outputStream, true);
+
         InputStream inputStream = sock.getInputStream();
+
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
+        IEncryption encryption = EncryptionImpl.getInstance();
+
         String encryptString = encryption.encryptMessage(jsonRequest);
+
         printWriter.println(encryptString);
 
         //Receive Response
@@ -67,13 +77,23 @@ public class Client implements IClient {
         }
     }
 
-    private void savePin(String pin) {
+    private void savePin(String pin) throws Exception {
+        File file = new File(cardFileName);
+        if(file.exists()){
+            System.out.println(255);
+            System.exit(-1);
+        }
+        FileUtils.writeStringToFile(file, EncryptionImpl.getInstance().encryptMessage(pin),"UTF-8");
     }
 
     public static void main(String[] args) throws IOException {
         CommandLineHandler commandLineHandler = new CommandLineHandler(args);
-        TransmissionPacket packet = RequestProcessor.generateRequest(RequestType.CHECKBALANCE, "dummy5", 5, "3250");
-        Client client = new Client();
-        client.clientRequest(packet, "bank.auth");
+        TransmissionPacket packet = commandLineHandler.processCommandLineArguments().getPacket();
+        Client client = new Client(commandLineHandler.getCardFileName());
+        try {
+            client.clientRequest(packet);
+        } catch (Exception e) {
+            System.out.println(255);
+        }
     }
 }
