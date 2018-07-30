@@ -81,11 +81,11 @@ public class CommandLineHandler {
 
         } catch (UnrecognizedOptionException ex) {
             System.exit(255);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (MissingArgumentException e){
             System.exit(255);
-        }
-
+        }catch (ParseException e) {
+            System.exit(255);
+        } 
     }
 
     private String readCardFile() {
@@ -129,11 +129,15 @@ public class CommandLineHandler {
         if (!Validator.checkOperations(opts)) {
             Validator.fail();
         }
-        this.cardFileName = commandLine.getOptionValue(SharedConstants.CMD_C);
+
         Arrays.stream(commandLine.getOptions()).forEach(option -> {
             AtmInput input;
             switch (option.getOpt()) {
                 case SharedConstants.CMD_N:
+                    this.cardFileName = commandLine.getOptionValue(SharedConstants.CMD_C);
+                    if(Validator.checkCardFile(getCardFileName())){
+                        Validator.fail();
+                    }
                     input = new AtmInput(commandLine, null);
                     setTransmissionPacket(Atm.createAccount(input));
                     break;
