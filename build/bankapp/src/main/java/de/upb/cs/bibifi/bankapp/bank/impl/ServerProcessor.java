@@ -66,7 +66,7 @@ public class ServerProcessor implements IServerProcessor {
 
     private String deposit(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
-        Integer balance = Integer.parseInt(transmissionPacket.getProperty(KEY_DEPOSITE));
+        Double balance = Double.parseDouble(transmissionPacket.getProperty(KEY_DEPOSITE));
         String pin = transmissionPacket.getProperty(KEY_PIN);
         boolean success = Bank.getBank().deposit(accountName, pin, balance);
         Response response;
@@ -93,7 +93,7 @@ public class ServerProcessor implements IServerProcessor {
 
     private String withdraw(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
-        Integer balance = Integer.parseInt(transmissionPacket.getProperty(KEY_WIHTDRAW));
+        Double balance = Double.parseDouble(transmissionPacket.getProperty(KEY_WIHTDRAW));
         String pin = transmissionPacket.getProperty(KEY_PIN);
         boolean success = Bank.getBank().withdraw(accountName, pin, balance);
         Response response;
@@ -115,26 +115,26 @@ public class ServerProcessor implements IServerProcessor {
         switch (type) {
             case CREATE:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
-                obj.put(KEY_INITIAL_BALANCE, Integer.parseInt(transmissionPacket.getProperty(KEY_BALANCE)));
+                obj.put(KEY_INITIAL_BALANCE, Double.parseDouble(transmissionPacket.getProperty(KEY_BALANCE)));
                 message = obj.toString();
                 response = new CreationResponse(message, 0, data);
                 System.out.println(response.getMessage());
                 break;
             case DEPOSIT:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
-                obj.put(KEY_DEPOSITE, Integer.parseInt(transmissionPacket.getProperty(KEY_DEPOSITE)));
+                obj.put(KEY_DEPOSITE, Double.parseDouble(transmissionPacket.getProperty(KEY_DEPOSITE)));
                 message = obj.toString();
                 response = new Response(message, 0);
                 break;
             case WITHDRAW:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
-                obj.put(KEY_WIHTDRAW, Integer.parseInt(transmissionPacket.getProperty(KEY_WIHTDRAW)));
+                obj.put(KEY_WIHTDRAW, Double.parseDouble(transmissionPacket.getProperty(KEY_WIHTDRAW)));
                 message = obj.toString();
                 response = new Response(message, 0);
                 break;
             case CHECKBALANCE:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
-                obj.put(KEY_BALANCE, new Integer(data));
+                obj.put(KEY_BALANCE, new Double(data));
                 message = obj.toString();
                 response = new Response(message, 0);
                 break;
