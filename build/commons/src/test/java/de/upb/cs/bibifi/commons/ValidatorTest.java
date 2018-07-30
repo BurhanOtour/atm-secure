@@ -1,12 +1,14 @@
 package de.upb.cs.bibifi.commons;
 
 import de.upb.cs.bibifi.commons.validator.Validator;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.jupiter.api.*;
 
-public class ValidatorTest  {
+public class ValidatorTest {
 
     @Test
     public void testValidateNumerals() {
@@ -61,19 +63,19 @@ public class ValidatorTest  {
         StringBuilder sbt = new StringBuilder(validNum);
         StringBuilder sbf = new StringBuilder(invalidNum);
 
-        for(int i=0; i < invalidNum ; i++){
+        for (int i = 0; i < invalidNum; i++) {
             sbf.append(strCharacter);
         }
 
-        for(int i=0; i < validNum ; i++){
+        for (int i = 0; i < validNum; i++) {
             sbt.append(strCharacter);
         }
 
-        String[] argArray1=new String[1];
-        argArray1[0] =sbt.toString();
+        String[] argArray1 = new String[1];
+        argArray1[0] = sbt.toString();
 
-        String[] argArray2=new String[1];
-        argArray2[0] =sbf.toString();
+        String[] argArray2 = new String[1];
+        argArray2[0] = sbf.toString();
 
         Assertions.assertTrue(validator.validateArgumentLength(argArray1));
         Assertions.assertFalse(validator.validateArgumentLength(argArray2));
@@ -83,16 +85,16 @@ public class ValidatorTest  {
     public void testCheckDuplicates() {
         String strValid = "c";
         String strInvalid = "a";
-        Set<String> strSet = new HashSet<String>(Arrays.asList( "a","g","n"));
+        Set<String> strSet = new HashSet<String>(Arrays.asList("a", "g", "n"));
         Validator validator = new Validator();
-        Assertions.assertTrue(validator.checkDuplicates(strValid, strSet ));
+        Assertions.assertTrue(validator.checkDuplicates(strValid, strSet));
         Assertions.assertFalse(validator.checkDuplicates(strInvalid, strSet));
     }
 
     @Test
     public void testCheckOperations() {
-        Set<String> strSetValid = new HashSet<String>(Arrays.asList( "a","g"));
-        Set<String> strSetInvalid = new HashSet<String>(Arrays.asList( "a","g","w"));
+        Set<String> strSetValid = new HashSet<String>(Arrays.asList("a", "g"));
+        Set<String> strSetInvalid = new HashSet<String>(Arrays.asList("a", "g", "w"));
         Validator validator = new Validator();
         Assertions.assertTrue(validator.checkOperations(strSetValid));
         Assertions.assertFalse(validator.checkOperations(strSetInvalid));
