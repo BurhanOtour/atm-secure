@@ -39,10 +39,11 @@ public class Server implements IServer {
         options.addOption("s", "authfile", true, "Authentication File");
         options.addOption("p", "port", true, "port");
 
-        Validator.applyValidators(commandLine.getOptions());
-
         try {
             commandLine = commandLineParser.parse(options, args);
+
+            Validator.applyValidators(commandLine.getOptions());
+            
         } catch (UnrecognizedOptionException ex) {
             System.exit(255);
         } catch (ParseException e) {
