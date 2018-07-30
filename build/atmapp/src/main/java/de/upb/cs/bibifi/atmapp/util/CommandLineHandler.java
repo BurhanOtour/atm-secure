@@ -85,7 +85,7 @@ public class CommandLineHandler {
             System.exit(255);
         }catch (ParseException e) {
             System.exit(255);
-        } 
+        }
     }
 
     private String readCardFile() {
@@ -129,12 +129,11 @@ public class CommandLineHandler {
         if (!Validator.checkOperations(opts)) {
             Validator.fail();
         }
-
+        this.cardFileName = commandLine.getOptionValue(SharedConstants.CMD_C);
         Arrays.stream(commandLine.getOptions()).forEach(option -> {
             AtmInput input;
             switch (option.getOpt()) {
                 case SharedConstants.CMD_N:
-                    this.cardFileName = commandLine.getOptionValue(SharedConstants.CMD_C);
                     if(Validator.checkCardFile(getCardFileName())){
                         Validator.fail();
                     }
