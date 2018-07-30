@@ -76,13 +76,15 @@ public class Server implements IServer {
 
     @Override
     public void start() throws Exception {
+        PrintWriter print = null;
         while (true) {
             try {
                 //Open Socket for accepting request
                 Socket sock = serverSocket.accept();
                 OutputStream out = sock.getOutputStream();
-                PrintWriter print = new PrintWriter(out, true);
+                print = new PrintWriter(out, true);
 
+                sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
                 InputStream istream = sock.getInputStream();
                 BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
                 String receiveMessage, decryptMsg = null;
@@ -103,14 +105,13 @@ public class Server implements IServer {
                 } else {
                     continue;
                 }
-            } catch (SocketTimeoutException ex) {
-                System.out.println("protocol_error");
-            } catch (IllegalBlockingModeException ex) {
-                System.out.println("protocol_error");
             } catch (IllegalArgumentException ex) {
-                System.out.println("protocol_error");
-            } catch (Exception ex) {
-                System.exit(255);
+                System.err.println(255);
+                fail();
+            } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
+                System.err.println(67);
+                print.flush();
+                continue;
             }
         }
     }
@@ -134,5 +135,9 @@ public class Server implements IServer {
                 System.exit(255);
             }
         }
+    }
+
+    public void fail() {
+        System.err.println(255);
     }
 }
