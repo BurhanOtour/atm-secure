@@ -3,6 +3,7 @@ package de.upb.cs.bibifi.commons.validator;
 import de.upb.cs.bibifi.commons.constants.SharedConstants;
 import org.apache.commons.cli.Option;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -136,6 +137,16 @@ public class Validator {
             }
         }
         return match;
+    }
+
+    /**
+     * check if card file Exists
+     * @param Path
+     * @return
+     */
+    public static boolean checkCardFile(String Path){
+        File file = new File(Path);
+        return file.exists();
     }
 
     /**

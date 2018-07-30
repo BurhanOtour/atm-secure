@@ -129,7 +129,12 @@ public class CommandLineHandler {
         if (!Validator.checkOperations(opts)) {
             Validator.fail();
         }
+
         this.cardFileName = commandLine.getOptionValue(SharedConstants.CMD_C);
+        if(Validator.checkCardFile(getCardFileName())){
+            Validator.fail();
+        }
+
         Arrays.stream(commandLine.getOptions()).forEach(option -> {
             AtmInput input;
             switch (option.getOpt()) {
