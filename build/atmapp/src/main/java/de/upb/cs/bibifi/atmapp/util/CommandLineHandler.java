@@ -130,15 +130,14 @@ public class CommandLineHandler {
             Validator.fail();
         }
 
-        this.cardFileName = commandLine.getOptionValue(SharedConstants.CMD_C);
-        if(Validator.checkCardFile(getCardFileName())){
-            Validator.fail();
-        }
-
         Arrays.stream(commandLine.getOptions()).forEach(option -> {
             AtmInput input;
             switch (option.getOpt()) {
                 case SharedConstants.CMD_N:
+                    this.cardFileName = commandLine.getOptionValue(SharedConstants.CMD_C);
+                    if(Validator.checkCardFile(getCardFileName())){
+                        Validator.fail();
+                    }
                     input = new AtmInput(commandLine, null);
                     setTransmissionPacket(Atm.createAccount(input));
                     break;
