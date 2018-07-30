@@ -1,7 +1,6 @@
 package de.upb.cs.bibifi.commons.dto;
 
 import de.upb.cs.bibifi.commons.enums.RequestType;
-import de.upb.cs.bibifi.commons.enums.StatusCode;
 
 import java.util.HashMap;
 

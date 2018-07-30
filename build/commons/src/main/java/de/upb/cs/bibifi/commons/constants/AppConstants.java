@@ -16,4 +16,6 @@ public class AppConstants {
     public static final String KEY_WIHTDRAW = "withdraw";
 
     public static final String KEY_PIN = "pin";
+
+    public static final int SOCKET_TIMEOUT = 4000;
 }

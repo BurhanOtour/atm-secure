@@ -14,7 +14,8 @@ import java.io.OutputStream;
 
 public class EncryptionTest {
 
-    @Test public void EncryptionTest() throws Exception{
+    @Test
+    public void EncryptionTest() throws Exception {
         String helloMessage = "Hello encryption";
         String key = "PrvQH+6bvZPJrqR02ntOFw";
         IEncryption encryption = EncryptionImpl.initialize(key);

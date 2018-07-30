@@ -25,13 +25,12 @@ public class AuthFile {
 
     public static AuthFile getAuthFile(String authFilePath) {
         Gson gson = new Gson();
-        String string = null;
+        String string;
         AuthFile auth = null;
         try {
             string = FileUtils.readFileToString(new File(authFilePath), "UTF-8");
             auth = gson.fromJson(string, AuthFile.class);
         } catch (IOException e) {
-            System.out.println(255);
             System.exit(255);
         }
         return auth;
