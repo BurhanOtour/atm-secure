@@ -1,14 +1,14 @@
 package de.upb.cs.bibifi.commons.validator;
 
+import de.upb.cs.bibifi.commons.constants.SharedConstants;
+import org.apache.commons.cli.Option;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Validator {
-
-    public Validator() {
-    }
 
     /**
      * check if arguments are duplicated
@@ -17,7 +17,7 @@ public class Validator {
      * @param options
      * @return
      */
-    public boolean checkDuplicates(String option, Set<String> options) {
+    public static boolean checkDuplicates(String option, Set<String> options) {
         return options.add(option);
     }
 
@@ -27,7 +27,7 @@ public class Validator {
      * @param numeral
      * @return
      */
-    public boolean validateNumerals(String numeral) {
+    public static boolean validateNumerals(String numeral) {
         double max_amount = 4294967295.99;
         double amount = 0;
         Pattern pattern = Pattern.compile("^(0|[1-9][0-9]*)\\.\\d{2}$");
@@ -45,9 +45,9 @@ public class Validator {
      * @param ipString
      * @return
      */
-    public boolean validateIP(String ipString) {
+    public static boolean validateIP(String ipString) {
         Pattern pattern = Pattern.compile(
-            "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+                "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
         return pattern.matcher(ipString).matches();
     }
 
@@ -57,7 +57,7 @@ public class Validator {
      * @param portString
      * @return
      */
-    public boolean validatePort(String portString) {
+    public static boolean validatePort(String portString) {
         int min_num = 1024;
         int max_num = 65535;
         int amount = 0;
@@ -66,7 +66,7 @@ public class Validator {
         } catch (NumberFormatException e) {
 
         }
-        return amount >= min_num && amount <= max_num ? true : false ;
+        return amount >= min_num && amount <= max_num ? true : false;
     }
 
     /**
@@ -75,9 +75,9 @@ public class Validator {
      * @param fileName
      * @return
      */
-    public boolean validateFileName(String fileName) {
+    public static boolean validateFileName(String fileName) {
         Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
-        return (fileName.length() <= 127 && !fileName.equals(".")  && !fileName.equals("..") )  ? pattern.matcher(fileName).matches() : false;
+        return (fileName.length() <= 127 && !fileName.equals(".") && !fileName.equals("..")) ? pattern.matcher(fileName).matches() : false;
     }
 
     /**
@@ -86,7 +86,7 @@ public class Validator {
      * @param accountName
      * @return
      */
-    public boolean validateAccountName(String accountName) {
+    public static boolean validateAccountName(String accountName) {
         Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
         return accountName.length() < 123 ? pattern.matcher(accountName).matches() : false;
     }
@@ -97,7 +97,7 @@ public class Validator {
      * @param initialBalance
      * @return
      */
-    public boolean validateInitialBalance(String initialBalance) {
+    public static boolean validateInitialBalance(String initialBalance) {
         double amount = 0;
         try {
             amount = Double.parseDouble(initialBalance);
@@ -113,7 +113,7 @@ public class Validator {
      * @param options
      * @return
      */
-    public boolean checkOperations(Set<String> options) {
+    public static boolean checkOperations(Set<String> options) {
 
         final String CMD_D = "d";
         final String CMD_W = "w";
@@ -130,7 +130,7 @@ public class Validator {
         for (String str : operations) {
             if (options.contains(str) && match != true) {
                 match = true;
-            }else if (options.contains(str) && match == true){
+            } else if (options.contains(str) && match == true) {
                 match = false;
                 break;
             }
@@ -144,7 +144,62 @@ public class Validator {
      * @param args
      * @return
      */
-    public boolean validateArgumentLength( String[] args) {
-        return  !Arrays.stream(args).anyMatch(arg->arg.length()>4096);
+    public static boolean validateArgumentLength(String[] args) {
+        return !Arrays.stream(args).anyMatch(arg -> arg.length() > 4096);
+    }
+
+    /**
+     * Apply set of validators to all input parameters
+     *
+     * @param options
+     * @return
+     */
+    public static void applyValidators(Option[] options) {
+
+        Set<String> duplicateOptionsSet = new HashSet<>();
+
+        Arrays.stream(options).forEach(option -> {
+
+            if (!checkDuplicates(option.getOpt(), duplicateOptionsSet))
+                fail();
+
+            switch (option.getOpt()) {
+                case SharedConstants.CMD_N:
+                    if (!validateNumerals(option.getValue()) || !Validator.validateInitialBalance(option.getValue()))
+                        fail();
+                    break;
+                case SharedConstants.CMD_D:
+                case SharedConstants.CMD_W:
+                    if (!validateNumerals(option.getValue()))
+                        fail();
+                    break;
+                case SharedConstants.CMD_I:
+                    if (!validateIP(option.getValue()))
+                        fail();
+                    break;
+                case SharedConstants.CMD_P:
+                    if (!validatePort(option.getValue()))
+                        fail();
+                    break;
+                case SharedConstants.CMD_C:
+                case SharedConstants.CMD_S:
+                    if (!validateFileName(option.getValue()))
+                        fail();
+                    break;
+                case SharedConstants.CMD_A:
+                    if (!validateAccountName((option.getValue())))
+                        fail();
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Exit application by displaying en error code.
+     */
+    public static void fail() {
+        System.exit(255);
     }
 }
