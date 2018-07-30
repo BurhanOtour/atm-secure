@@ -70,19 +70,17 @@ public class Client implements IClient {
                     return;
                 }
             }
-        } catch (SocketTimeoutException ex) {
-            System.exit(63);
-        } catch (IllegalBlockingModeException ex) {
-            System.exit(63);
-        } catch (IllegalArgumentException ex) {
-            System.exit(63);
+        } catch (SocketTimeoutException | IllegalBlockingModeException | IllegalArgumentException ex) {
+            System.err.println(63);
+            System.err.println(ex.getMessage());
         }
     }
 
     private void savePin(String pin) throws Exception {
         File file = new File(cardFileName);
         if (file.exists()) {
-            System.exit(255);
+            System.err.println(255);
+            fail();
         }
         FileUtils.writeStringToFile(file, EncryptionImpl.getInstance().encryptMessage(pin), "UTF-8");
     }
@@ -96,5 +94,13 @@ public class Client implements IClient {
         } catch (Exception e) {
             System.exit(255);
         }
+    }
+
+    public void fail() {
+        System.exit(255);
+    }
+
+    public void networkFail() {
+        System.exit(63);
     }
 }
