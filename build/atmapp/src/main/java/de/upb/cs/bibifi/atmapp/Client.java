@@ -16,6 +16,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.nio.channels.IllegalBlockingModeException;
 
 public class Client implements IClient {
 
@@ -34,24 +36,19 @@ public class Client implements IClient {
 
         String jsonRequest = Utilities.Serializer(request);
 
+        try
+        {
         Socket sock = new Socket(ip, port);
+        sock.setSoTimeout(5000);
 
         OutputStream outputStream = sock.getOutputStream();
-
         PrintWriter printWriter = new PrintWriter(outputStream, true);
-
         InputStream inputStream = sock.getInputStream();
-
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
         IEncryption encryption = EncryptionImpl.getInstance();
-
         String encryptString = encryption.encryptMessage(jsonRequest);
-
         printWriter.println(encryptString);
-
         printWriter.flush();
-
         //Receive Response
         String receivedMessage;
         if ((receivedMessage = br.readLine()) != null) {
@@ -77,6 +74,17 @@ public class Client implements IClient {
                 return;
             }
         }
+        }catch (SocketTimeoutException ex) {
+            System.exit(63);
+        }catch (IllegalBlockingModeException ex){
+            System.exit(63);
+        }catch (IllegalArgumentException  ex){
+            System.exit(63);
+        }
+        catch(Exception ex){
+            System.exit(255);
+        }
+
     }
 
     private void savePin(String pin) throws Exception {
