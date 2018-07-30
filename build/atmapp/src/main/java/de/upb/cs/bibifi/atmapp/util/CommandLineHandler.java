@@ -81,11 +81,11 @@ public class CommandLineHandler {
 
         } catch (UnrecognizedOptionException ex) {
             System.exit(255);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (MissingArgumentException e){
             System.exit(255);
-        }
-
+        }catch (ParseException e) {
+            System.exit(255);
+        } 
     }
 
     private String readCardFile() {
