@@ -13,12 +13,13 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 public class Bank implements IBank {
     private String authFile;
 
-    private double currentBalance;
+    private BigDecimal currentBalance;
 
     private Account currentAccount;
 
@@ -62,12 +63,13 @@ public class Bank implements IBank {
      * @return if the account creation protocol is respected it should return the pin back
      */
     @Override
-    public String createBalance(String acc, double balance) {
+    public String createBalance(String acc, String balance) {
         Account account = accounts.get(acc);
         if (account != null) {
             return null;
         }
-        if (balance < 10) {
+        BigDecimal newBalance = new BigDecimal(balance);
+        if (newBalance.compareTo(new BigDecimal("10.00")) == -1) {
             return null;
         }
         String generatedPin = generatePIN();
@@ -79,12 +81,13 @@ public class Bank implements IBank {
     }
 
     @Override
-    public boolean deposit(String acc, String pin, double balance) {
+    public boolean deposit(String acc, String pin, String balanceString) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
             return false;
         }
-        if (balance <= 0) {
+        BigDecimal balance = new BigDecimal(balanceString);
+        if (balance.compareTo(BigDecimal.ZERO) == 0 || balance.compareTo(BigDecimal.ZERO) == -1) {
             return false;
         }
         this.currentAccount = account;
@@ -94,12 +97,12 @@ public class Bank implements IBank {
     }
 
     @Override
-    public boolean withdraw(String acc, String pin, double balance) {
+    public boolean withdraw(String acc, String pin, String balanceString) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
             return false;
         }
-
+        BigDecimal balance = new BigDecimal(balanceString);
         this.type = RequestType.WITHDRAW;
         this.currentBalance = balance;
         this.currentAccount = account;
@@ -107,10 +110,10 @@ public class Bank implements IBank {
     }
 
     @Override
-    public double checkBalance(String acc, String pin) {
+    public BigDecimal checkBalance(String acc, String pin) {
         Account account = validateAccountData(acc, pin);
         if (account == null) {
-            return -1;
+            return new BigDecimal("-1");
         }
         return account.getBalance();
     }
@@ -143,7 +146,7 @@ public class Bank implements IBank {
     private void resetTransaction() {
         this.type = null;
         this.currentAccount = null;
-        this.currentBalance = 0;
+        this.currentBalance = BigDecimal.ZERO;
     }
 
     public String hashMessage(String message) {

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,38 +67,38 @@ class BankTest {
     void rollbackCreateAccountOperationTest() throws Exception {
         IBank bank = Bank.getBank();
         bank.startup(authFileName);
-        final int sampleBalance = 21;
+        final String sampleBalance = "21.23";
         String pin = bank.createBalance("foo", sampleBalance);
-        assertEquals(sampleBalance, bank.checkBalance("foo", pin));
-        assertEquals(sampleBalance, bank.checkBalance("foo", pin));
+        assertTrue(new BigDecimal(sampleBalance).compareTo(bank.checkBalance("foo", pin))==0);
+        assertTrue(new BigDecimal(sampleBalance).compareTo(bank.checkBalance("foo", pin))==0);
         bank.undo();
-        assertEquals(-1, Bank.getBank().checkBalance("foo", pin));
+        assertEquals(new BigDecimal("-1"), Bank.getBank().checkBalance("foo", pin));
     }
 
     @Test
     void rollbackDepositeOperationTest() throws Exception {
         IBank bank = Bank.getBank();
         bank.startup(authFileName);
-        final int sampleBalance = 21;
+        final String sampleBalance = "21.123";
         String pin = bank.createBalance("foo", sampleBalance);
         bank.commit();
-        bank.deposit("foo", pin, 10);
+        bank.deposit("foo", pin, "10");
         bank.undo();
-        assertEquals(sampleBalance, bank.checkBalance("foo", pin));
+        assertTrue(new BigDecimal(sampleBalance).compareTo(bank.checkBalance("foo", pin)) == 0);
     }
 
     @Test
     void rollbackWithdrawOperationTest() throws Exception {
         IBank bank = Bank.getBank();
         bank.startup(authFileName);
-        final int sampleBalance = 21;
+        final String sampleBalance = "19.99";
         String pin = bank.createBalance("foo", sampleBalance);
         bank.commit();
-        bank.withdraw("foo", pin, 10);
+        bank.withdraw("foo", pin, "0.99");
         bank.commit();
-        bank.withdraw("foo", pin, 5);
+        bank.withdraw("foo", pin, "10");
         bank.undo();
-        assertEquals(11, bank.checkBalance("foo", pin));
+        assertTrue(new BigDecimal("19").compareTo(bank.checkBalance("foo", pin)) == 0);
     }
 
     @Test
@@ -130,13 +131,13 @@ class BankTest {
     void multipleTransactionTest() throws Exception {
         Bank.getBank().startup(authFileName);
 
-        int fooInitialBanalce = 12;
+        String fooInitialBanalce = "12";
         String fooPin = Bank.getBank().createBalance("foo", fooInitialBanalce);
         Bank.getBank().commit();
-        assertEquals(fooInitialBanalce, Bank.getBank().checkBalance("foo", fooPin));
+        assertTrue(new BigDecimal(fooInitialBanalce).compareTo(Bank.getBank().checkBalance("foo", fooPin)) == 0);
         try {
-            int booInitialBanalce = 9;
-            String booPin = Bank.getBank().createBalance("foo", fooInitialBanalce);
+            String booInitialBanalce = "9";
+            String booPin = Bank.getBank().createBalance("boo", booInitialBanalce);
             Bank.getBank().commit();
         } catch (Exception e) {
             assertTrue(true);
@@ -146,22 +147,22 @@ class BankTest {
         Bank.getBank().commit();
         Bank.getBank().commit();
 
-        assertFalse(Bank.getBank().withdraw("foo", fooPin, -1000));
+        assertFalse(Bank.getBank().withdraw("foo", fooPin, "-1000"));
         Bank.getBank().commit();
-        assertFalse(Bank.getBank().withdraw("foo", fooPin, 13));
+        assertFalse(Bank.getBank().withdraw("foo", fooPin, "13"));
         Bank.getBank().commit();
-        assertTrue(Bank.getBank().withdraw("foo", fooPin, 12));
+        assertTrue(Bank.getBank().withdraw("foo", fooPin, "12"));
         Bank.getBank().commit();
-        assertTrue(Bank.getBank().deposit("foo", fooPin, 10));
+        assertTrue(Bank.getBank().deposit("foo", fooPin, "10"));
         Bank.getBank().undo();
         // That doesn't have any effect since we already undone the work
         Bank.getBank().commit();
-        assertEquals(0, Bank.getBank().checkBalance("foo", fooPin));
-        assertTrue(Bank.getBank().deposit("foo", fooPin, 10));
+        assertEquals(BigDecimal.ZERO, Bank.getBank().checkBalance("foo", fooPin));
+        assertTrue(Bank.getBank().deposit("foo", fooPin, "10"));
         Bank.getBank().commit();
-        assertTrue(Bank.getBank().withdraw("foo", fooPin, 10));
+        assertTrue(Bank.getBank().withdraw("foo", fooPin, "10"));
         Bank.getBank().undo();
-        assertEquals(10, Bank.getBank().checkBalance("foo", fooPin));
+        assertEquals(new BigDecimal("10"), Bank.getBank().checkBalance("foo", fooPin));
     }
 
     @Test
@@ -169,10 +170,10 @@ class BankTest {
         final String key = "key";
         IBank bank = Bank.getBank();
         bank.startup(authFileName);
-        bank.createBalance(key, 103);
+        bank.createBalance(key, "103");
         bank.commit();
         try {
-            bank.createBalance(key, 103);
+            bank.createBalance(key, "103");
         } catch (Exception e) {
             assertTrue(true);
         }
