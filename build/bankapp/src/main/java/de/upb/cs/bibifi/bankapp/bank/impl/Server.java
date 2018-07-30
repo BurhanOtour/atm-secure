@@ -9,6 +9,7 @@ import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
+import de.upb.cs.bibifi.commons.validator.Validator;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -27,7 +28,6 @@ public class Server implements IServer {
     private String authFile = null;
     private int port = 0;
 
-    //@TODO Add input validation and handling
     public static void main(String[] args) {
 
         CommandLineParser commandLineParser = new DefaultParser();
@@ -41,8 +41,13 @@ public class Server implements IServer {
 
         try {
             commandLine = commandLineParser.parse(options, args);
+
+            Validator.applyValidators(commandLine.getOptions());
+            
+        } catch (UnrecognizedOptionException ex) {
+            System.exit(255);
         } catch (ParseException e) {
-            e.printStackTrace();
+            System.exit(255);
         }
 
         try {
