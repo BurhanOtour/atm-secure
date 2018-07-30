@@ -186,8 +186,8 @@ public class CommandLineHandler {
 
             switch (option.getOpt()) {
                 case CMD_N:
-                    /*if (!validator.validateNumerals(option.getValue()) || !validator.validateInitialBalance(option.getValue()))
-                        fail();*/
+                    if (!validator.validateNumerals(option.getValue()) || !validator.validateInitialBalance(option.getValue()))
+                        fail();
                     break;
                 case CMD_D:
                 case CMD_W:
