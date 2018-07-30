@@ -1,19 +1,19 @@
 package de.upb.cs.bibifi.bankapp.bank;
 
-import de.upb.cs.bibifi.bankapp.data.Account;
+import java.math.BigDecimal;
 
 public interface IBank {
     void startup(String authFileName) throws Exception;
 
-    String createBalance(String acc, double balance);
+    String createBalance(String acc, String balance);
 
-    boolean deposit(String acc, String pin, double balance);
+    boolean deposit(String acc, String pin, String balance);
 
-    boolean withdraw(String acc, String pin, double balance);
+    boolean withdraw(String acc, String pin, String balance);
 
-    double checkBalance(String acc, String pin);
+    BigDecimal checkBalance(String acc, String pin);
 
-    public void commit();
+    void commit();
 
-    public void undo();
+    void undo();
 }

@@ -1,17 +1,19 @@
 package de.upb.cs.bibifi.bankapp.data;
 
+import java.math.BigDecimal;
+
 public class Account {
-    private double balance;
+    private BigDecimal balance;
     private String name;
     private String hashedPin;
 
-    public Account(double balance, String name, String hashedPin) {
-        this.balance = balance;
+    public Account(String balance, String name, String hashedPin) {
+        this.balance = new BigDecimal(balance);
         this.name = name;
         this.hashedPin = hashedPin;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
@@ -23,14 +25,14 @@ public class Account {
         return name;
     }
 
-    public boolean addBalance(double newBalance) {
-        this.balance += newBalance;
+    public boolean addBalance(BigDecimal newBalance) {
+        this.balance = this.balance.add(newBalance);
         return true;
     }
 
-    public boolean withdrawBalance(double balance) {
-        if (this.balance >= balance && balance > 0.0) {
-            this.balance -= balance;
+    public boolean withdrawBalance(BigDecimal balance) {
+        if ((this.balance.compareTo(balance) == 0 || this.balance.compareTo(balance) == 1) && balance.compareTo(BigDecimal.ZERO) == 1) {
+            this.balance = this.balance.subtract(balance);
             return true;
         } else {
             return false;
@@ -47,7 +49,7 @@ public class Account {
             return false;
 
         Account that = (Account) obj;
-        if (this.balance != that.balance || !this.hashedPin.equals(that.hashedPin) || !this.name.equals(that.name))
+        if (this.balance.compareTo(that.balance) != 0 || !this.hashedPin.equals(that.hashedPin) || !this.name.equals(that.name))
             return false;
         return true;
     }
@@ -56,7 +58,7 @@ public class Account {
     public int hashCode() {
         int result = 17;
         result = 31 * result + name.hashCode();
-        result = 31 * result + (int)balance;
+        result = 31 * result + balance.hashCode();
         result = 31 * result + hashedPin.hashCode();
         return result;
     }

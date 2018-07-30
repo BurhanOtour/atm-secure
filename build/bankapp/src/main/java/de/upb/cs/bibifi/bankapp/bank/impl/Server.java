@@ -97,14 +97,11 @@ public class Server implements IServer {
                 //Take decrypted msg and make pkt
                 String json = decryptMsg.toString();
                 TransmissionPacket requestPkt = Utilities.deserializer(json);
-                if (validTransmission(requestPkt)) {
-                    String resJson = processor.executeOperation(requestPkt);
-                    String response = encryption.encryptMessage(resJson);
-                    print.println(response);
-                    print.flush();
-                } else {
-                    continue;
-                }
+
+                String resJson = processor.executeOperation(requestPkt);
+                String response = encryption.encryptMessage(resJson);
+                print.println(response);
+                print.flush();
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);
                 fail();
