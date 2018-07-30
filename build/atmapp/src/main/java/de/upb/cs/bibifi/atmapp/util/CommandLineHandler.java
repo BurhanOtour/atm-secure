@@ -83,7 +83,7 @@ public class CommandLineHandler {
             applyValidators(commandLine.getOptions());
 
             // Retrieve the AuthFile Content
-            String key = AuthFile.getAuthFile(commandLine.getOptionValue(CMD_S)).getKey();
+            String key = AuthFile.getAuthFile(commandLine.getOptionValue(CMD_S,"bank.auth")).getKey();
 
             EncryptionImpl.initialize(key);
 
@@ -91,10 +91,11 @@ public class CommandLineHandler {
             this.ip = commandLine.getOptionValue("ip", "127.0.0.1");
             this.port = Integer.parseInt(commandLine.getOptionValue("port", "3000"));
 
-        } catch (ParseException e) {
+        }catch (UnrecognizedOptionException ex){
+            System.exit(255);
+        }catch (ParseException e) {
             e.printStackTrace();
             System.exit(255);
-            System.exit(1);
         }
 
     }
@@ -166,6 +167,8 @@ public class CommandLineHandler {
     }
 
     public String getCardFileName() {
+        if(cardFileName==null)
+            cardFileName = commandLine.getOptionValue(CMD_A)+".card";
         return cardFileName;
     }
 
