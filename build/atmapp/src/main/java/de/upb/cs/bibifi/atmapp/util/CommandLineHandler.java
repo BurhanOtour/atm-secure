@@ -91,7 +91,7 @@ public class CommandLineHandler {
     private String readCardFile() {
         String pin = null;
         try {
-            pin = EncryptionImpl.getInstance().decryptMessage(FileUtils.readFileToString(new File(commandLine.getOptionValue(SharedConstants.CMD_C)), "UTF-8"));
+            pin = EncryptionImpl.getInstance().decryptMessage(FileUtils.readFileToString(new File(getCardFileName()), "UTF-8"));
         } catch (Exception e) {
             System.exit(255);
         }
