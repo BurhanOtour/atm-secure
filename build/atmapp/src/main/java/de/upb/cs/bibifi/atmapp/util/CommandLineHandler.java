@@ -81,10 +81,13 @@ public class CommandLineHandler {
 
         } catch (UnrecognizedOptionException ex) {
             System.exit(255);
+            System.err.println(255);
         } catch (MissingArgumentException e){
             System.exit(255);
+            System.err.println(255);
         }catch (ParseException e) {
             System.exit(255);
+            System.err.println(255);
         }
     }
 
@@ -94,6 +97,7 @@ public class CommandLineHandler {
             pin = EncryptionImpl.getInstance().decryptMessage(FileUtils.readFileToString(new File(getCardFileName()), "UTF-8"));
         } catch (Exception e) {
             System.exit(255);
+            System.err.println(255);
         }
         return pin;
     }

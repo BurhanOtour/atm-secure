@@ -58,6 +58,7 @@ public class Client implements IClient {
                 }
                 if (responseObject.getCode() == 255 || responseObject.getCode() == 67) {
                     System.exit(255);
+                    System.err.println(255);
                 }
                 if (responseObject.getCode() == 0) {
                     if (request.getRequestType() == RequestType.CREATE) {
@@ -93,6 +94,7 @@ public class Client implements IClient {
             client.clientRequest(packet);
         } catch (Exception e) {
             System.exit(255);
+            System.err.println(255);
         }
     }
 
