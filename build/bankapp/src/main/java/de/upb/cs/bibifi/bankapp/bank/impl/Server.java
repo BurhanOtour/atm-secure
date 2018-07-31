@@ -106,7 +106,7 @@ public class Server implements IServer {
                 System.err.println(255);
                 fail();
             } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
-                System.err.println("protocol_error");
+                System.out.println("protocol_error");
                 print.flush();
                 continue;
             }
