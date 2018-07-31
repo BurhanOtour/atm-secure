@@ -2,15 +2,10 @@ package de.upb.cs.bibifi.commons;
 
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 
-import de.upb.cs.bibifi.commons.impl.Utilities;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class EncryptionTest {
 
