@@ -71,7 +71,8 @@ public class Client implements IClient {
                     sock.close();
                     return;
                 }
-            }
+            } else
+                System.exit(63);
         } catch (IllegalBlockingModeException | IllegalArgumentException | IOException | InterruptedException ex) {
             System.err.println(63);
             System.err.println(ex.getMessage());
@@ -89,7 +90,7 @@ public class Client implements IClient {
     }
 
     public static void main(String[] args) {
-        if(!InputPatternChecker.check(args)){
+        if (!InputPatternChecker.check(args)) {
             System.err.println(255);
             System.exit(255);
         }
