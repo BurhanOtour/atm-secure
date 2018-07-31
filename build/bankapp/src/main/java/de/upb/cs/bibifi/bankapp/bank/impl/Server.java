@@ -5,12 +5,14 @@ import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
 import de.upb.cs.bibifi.commons.IEncryption;
 import de.upb.cs.bibifi.commons.constants.AppConstants;
 import de.upb.cs.bibifi.commons.data.AuthFile;
+import de.upb.cs.bibifi.commons.dto.Response;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.validator.Validator;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
+import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -98,10 +100,17 @@ public class Server implements IServer {
                 //Take decrypted msg and make pkt
                 String json = decryptMsg.toString();
                 TransmissionPacket requestPkt = Utilities.deserializer(json);
+                Response response = processor.executeOperation(requestPkt);
 
-                String resJson = processor.executeOperation(requestPkt);
-                String response = encryption.encryptMessage(resJson);
-                print.println(response);
+                if (response.getCode() == 0) {
+                    System.out.println(response.getMessage());
+                    System.out.flush();
+                }
+
+                Gson gson = new Gson();
+                String resJson = gson.toJson(response);
+                String encryptResponse = encryption.encryptMessage(resJson);
+                print.println(encryptResponse);
                 print.flush();
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);

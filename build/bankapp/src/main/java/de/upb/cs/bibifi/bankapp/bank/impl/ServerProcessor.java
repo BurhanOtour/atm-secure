@@ -31,8 +31,8 @@ public class ServerProcessor implements IServerProcessor {
 
 
     // Validate TransmissionPacket before injecting it here!
-    public String executeOperation(TransmissionPacket transmissionPacket) {
-        String output = null;
+    public Response executeOperation(TransmissionPacket transmissionPacket) {
+        Response output = null;
         switch (transmissionPacket.getRequestType()) {
             case CREATE:
                 output = createAccount(transmissionPacket);
@@ -52,8 +52,7 @@ public class ServerProcessor implements IServerProcessor {
 
     }
 
-    // @TODO Store hard coded String into constants
-    private String createAccount(TransmissionPacket transmissionPacket) {
+    private Response createAccount(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
         String balance = transmissionPacket.getProperty(KEY_BALANCE);
         String pin = Bank.getBank().createBalance(accountName, balance);
@@ -63,10 +62,10 @@ public class ServerProcessor implements IServerProcessor {
         } else {
             response = buildResponse(RequestType.CREATE, transmissionPacket, pin);
         }
-        return gson.toJson(response);
+        return response;
     }
 
-    private String deposit(TransmissionPacket transmissionPacket) {
+    private Response deposit(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
         String balance = transmissionPacket.getProperty(KEY_DEPOSITE);
         String pin = transmissionPacket.getProperty(KEY_PIN);
@@ -77,10 +76,10 @@ public class ServerProcessor implements IServerProcessor {
         } else {
             response = new Response("", 255);
         }
-        return gson.toJson(response);
+        return response;
     }
 
-    private String checkBalance(TransmissionPacket transmissionPacket) {
+    private Response checkBalance(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
         String pin = transmissionPacket.getProperty(KEY_PIN);
         BigDecimal balance = Bank.getBank().checkBalance(accountName, pin);
@@ -90,10 +89,10 @@ public class ServerProcessor implements IServerProcessor {
         } else {
             response = buildResponse(RequestType.CHECKBALANCE, transmissionPacket, String.valueOf(balance));
         }
-        return gson.toJson(response);
+        return response;
     }
 
-    private String withdraw(TransmissionPacket transmissionPacket) {
+    private Response withdraw(TransmissionPacket transmissionPacket) {
         String accountName = transmissionPacket.getProperty(KEY_ACCOUNT_NAME);
         String balance = transmissionPacket.getProperty(KEY_WIHTDRAW);
         String pin = transmissionPacket.getProperty(KEY_PIN);
@@ -104,7 +103,7 @@ public class ServerProcessor implements IServerProcessor {
         } else {
             response = new Response("", 255);
         }
-        return gson.toJson(response);
+        return response;
     }
 
     private Response buildResponse(RequestType type, TransmissionPacket transmissionPacket, String data) {
@@ -117,8 +116,6 @@ public class ServerProcessor implements IServerProcessor {
                 obj.put(KEY_INITIAL_BALANCE, new BigDecimal(transmissionPacket.getProperty(KEY_BALANCE)));
                 message = obj.toString();
                 response = new CreationResponse(message, 0, data);
-                System.out.println(response.getMessage());
-                System.out.flush();
                 break;
             case DEPOSIT:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
