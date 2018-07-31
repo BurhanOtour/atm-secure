@@ -10,6 +10,7 @@ import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.enums.RequestType;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
+import de.upb.cs.bibifi.commons.validator.InputPatternChecker;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -89,14 +90,19 @@ public class Client implements IClient {
     }
 
     public static void main(String[] args) {
+        if(!InputPatternChecker.check(args)){
+            System.err.println(255);
+            System.exit(255);
+        }
+
         CommandLineHandler commandLineHandler = new CommandLineHandler(args);
         TransmissionPacket packet = commandLineHandler.processCommandLineArguments().getPacket();
         Client client = new Client(commandLineHandler.getCardFileName(), commandLineHandler.getIp(), commandLineHandler.getPort());
         try {
             client.clientRequest(packet);
         } catch (Exception e) {
-            System.exit(255);
             System.err.println(255);
+            System.exit(255);
         }
     }
 

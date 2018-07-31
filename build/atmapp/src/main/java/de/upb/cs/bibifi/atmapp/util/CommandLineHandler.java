@@ -6,6 +6,7 @@ import de.upb.cs.bibifi.commons.constants.SharedConstants;
 import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
+import de.upb.cs.bibifi.commons.validator.InputPatternChecker;
 import de.upb.cs.bibifi.commons.validator.Validator;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
@@ -20,7 +21,7 @@ public class CommandLineHandler {
 
     private CommandLine commandLine;
 
-    private String[] args = null;
+    private String[] args;
 
     private TransmissionPacket packet;
 
@@ -60,8 +61,11 @@ public class CommandLineHandler {
         options.addOption(SharedConstants.CMD_I, "ip", true, "initial ip");
         options.addOption(SharedConstants.CMD_P, "port", true, "initial port");
         options.addOption(SharedConstants.CMD_N, "initial", true, "initial balance");
-        options.addOption(SharedConstants.CMD_G, "checkbalance");
-
+        Option checkBalanceOption = Option.builder(SharedConstants.CMD_G)
+                .required(false)
+                .hasArg(false)
+                .build();
+        options.addOption(checkBalanceOption);
 
         try {
 
@@ -96,8 +100,8 @@ public class CommandLineHandler {
         try {
             pin = EncryptionImpl.getInstance().decryptMessage(FileUtils.readFileToString(new File(getCardFileName()), "UTF-8"));
         } catch (Exception e) {
-            System.exit(255);
             System.err.println(255);
+            System.exit(255);
         }
         return pin;
     }
