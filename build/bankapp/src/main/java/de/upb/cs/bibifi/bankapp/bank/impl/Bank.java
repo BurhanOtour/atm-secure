@@ -54,6 +54,7 @@ public class Bank implements IBank {
         }
         createAuthFile(this.authFile);
         System.out.println(AppConstants.BANK_CREATION_CONFIRMATION_MESSAGE);
+        System.out.flush();
         //this.authFile = authFileName;
     }
 
