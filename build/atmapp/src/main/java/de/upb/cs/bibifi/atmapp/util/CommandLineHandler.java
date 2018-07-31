@@ -27,6 +27,9 @@ public class CommandLineHandler {
 
     public CommandLineHandler(String[] args) {
         this.args = args;
+        if (Arrays.stream(args).anyMatch(x -> x.isEmpty() || x == null))
+            Validator.fail();
+
         init();
 
         //check arguments length
@@ -86,10 +89,10 @@ public class CommandLineHandler {
         } catch (UnrecognizedOptionException ex) {
             System.exit(255);
             System.err.println(255);
-        } catch (MissingArgumentException e){
+        } catch (MissingArgumentException e) {
             System.exit(255);
             System.err.println(255);
-        }catch (ParseException e) {
+        } catch (ParseException e) {
             System.exit(255);
             System.err.println(255);
         }
@@ -142,7 +145,7 @@ public class CommandLineHandler {
             AtmInput input;
             switch (option.getOpt()) {
                 case SharedConstants.CMD_N:
-                    if(Validator.checkCardFile(getCardFileName())){
+                    if (Validator.checkCardFile(getCardFileName())) {
                         Validator.fail();
                     }
                     input = new AtmInput(commandLine, null);
