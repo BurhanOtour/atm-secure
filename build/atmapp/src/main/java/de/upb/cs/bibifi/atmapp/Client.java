@@ -66,6 +66,7 @@ public class Client implements IClient {
                         savePin(responseCreationObject.getPin());
                     }
                     System.out.println(responseObject.getMessage());
+                    System.out.flush();
                     printWriter.flush();
                     sock.close();
                     return;
@@ -74,6 +75,7 @@ public class Client implements IClient {
         } catch (SocketTimeoutException | IllegalBlockingModeException | IllegalArgumentException ex) {
             System.err.println(63);
             System.err.println(ex.getMessage());
+            System.exit(63);
         }
     }
 

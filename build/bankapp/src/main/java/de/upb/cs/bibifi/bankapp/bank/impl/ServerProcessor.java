@@ -118,6 +118,7 @@ public class ServerProcessor implements IServerProcessor {
                 message = obj.toString();
                 response = new CreationResponse(message, 0, data);
                 System.out.println(response.getMessage());
+                System.out.flush();
                 break;
             case DEPOSIT:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));

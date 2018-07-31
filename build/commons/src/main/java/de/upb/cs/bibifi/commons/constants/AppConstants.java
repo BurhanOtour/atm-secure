@@ -11,7 +11,7 @@ public class AppConstants {
 
     public static final String KEY_ACCOUNT_NAME = "account";
     public static final String KEY_INITIAL_BALANCE = "initial_balance";
-    public static final String KEY_DEPOSITE = "deposite";
+    public static final String KEY_DEPOSITE = "deposit";
     public static final String KEY_BALANCE = "balance";
     public static final String KEY_WIHTDRAW = "withdraw";
 

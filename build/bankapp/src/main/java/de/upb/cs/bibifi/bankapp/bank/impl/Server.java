@@ -78,9 +78,10 @@ public class Server implements IServer {
     public void start() throws Exception {
         PrintWriter print = null;
         while (true) {
+            Socket sock = null;
             try {
                 //Open Socket for accepting request
-                Socket sock = serverSocket.accept();
+                sock = serverSocket.accept();
                 OutputStream out = sock.getOutputStream();
                 print = new PrintWriter(out, true);
 
@@ -107,7 +108,9 @@ public class Server implements IServer {
                 fail();
             } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
                 System.out.println("protocol_error");
+                System.out.flush();
                 print.flush();
+                sock.close();
                 continue;
             }
         }
