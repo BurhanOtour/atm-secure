@@ -59,6 +59,9 @@ public class Validator {
      * @return
      */
     public static boolean validatePort(String portString) {
+        if (!portString.matches("^[1-9][0-9]{3,4}$")) {
+            return false;
+        }
         int min_num = 1024;
         int max_num = 65535;
         int amount = 0;
@@ -67,7 +70,7 @@ public class Validator {
         } catch (NumberFormatException e) {
 
         }
-        return amount >= min_num && amount <= max_num ? true : false;
+        return amount >= min_num && amount <= max_num;
     }
 
     /**
@@ -141,10 +144,11 @@ public class Validator {
 
     /**
      * check if card file Exists
+     *
      * @param Path
      * @return
      */
-    public static boolean checkCardFile(String Path){
+    public static boolean checkCardFile(String Path) {
         File file = new File(Path);
         return file.exists();
     }
