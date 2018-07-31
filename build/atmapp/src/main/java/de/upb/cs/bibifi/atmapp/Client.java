@@ -72,7 +72,7 @@ public class Client implements IClient {
                     return;
                 }
             }
-        } catch (SocketTimeoutException | IllegalBlockingModeException | IllegalArgumentException ex) {
+        } catch (IllegalBlockingModeException | IllegalArgumentException | IOException | InterruptedException ex) {
             System.err.println(63);
             System.err.println(ex.getMessage());
             System.exit(63);
