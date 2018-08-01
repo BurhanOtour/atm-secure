@@ -2,7 +2,6 @@ package de.upb.cs.bibifi.bankapp.bank.impl;
 
 import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.commons.constants.AppConstants;
-import de.upb.cs.bibifi.bankapp.data.Account;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,13 +21,13 @@ class BankTest {
     private String authFileName;
 
     @BeforeEach
-    public void clearBunk() {
+    void clearBunk() {
         ((Bank) Bank.getBank()).reset();
         authFileName = generateAuthFileName();
     }
 
     @AfterEach
-    public void cleanup() throws IOException {
+    void cleanup() throws IOException {
         FileUtils.forceDelete(new File(authFileName));
     }
 
@@ -41,7 +40,7 @@ class BankTest {
     }
 
     @Test
-    void startupTest() throws IOException {
+    void startupTest() {
         IBank bank = Bank.getBank();
         try {
             bank.startup(authFileName);
@@ -53,7 +52,7 @@ class BankTest {
     }
 
     @Test
-    void twoAuthFileNameWithTheSameNameCanNotExistsTest() throws IOException {
+    void twoAuthFileNameWithTheSameNameCanNotExistsTest() {
         IBank bank = Bank.getBank();
         try {
             bank.startup(authFileName);
@@ -137,7 +136,7 @@ class BankTest {
         assertTrue(new BigDecimal(fooInitialBanalce).compareTo(Bank.getBank().checkBalance("foo", fooPin)) == 0);
         try {
             String booInitialBanalce = "9";
-            String booPin = Bank.getBank().createBalance("boo", booInitialBanalce);
+            Bank.getBank().createBalance("boo", booInitialBanalce);
             Bank.getBank().commit();
         } catch (Exception e) {
             assertTrue(true);

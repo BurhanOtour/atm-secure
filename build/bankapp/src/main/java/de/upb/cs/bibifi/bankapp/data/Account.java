@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class Account {
     private BigDecimal balance;
-    private String name;
-    private String hashedPin;
+    private final String name;
+    private final String hashedPin;
 
     public Account(String balance, String name, String hashedPin) {
         this.balance = new BigDecimal(balance);
@@ -49,9 +49,7 @@ public class Account {
             return false;
 
         Account that = (Account) obj;
-        if (this.balance.compareTo(that.balance) != 0 || !this.hashedPin.equals(that.hashedPin) || !this.name.equals(that.name))
-            return false;
-        return true;
+        return this.balance.compareTo(that.balance) == 0 && this.hashedPin.equals(that.hashedPin) && this.name.equals(that.name);
     }
 
     @Override

@@ -18,14 +18,6 @@ public class TransmissionPacket {
         this.requestType = requestType;
     }
 
-    public HashMap<String, String> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(HashMap<String, String> properties) {
-        this.properties = properties;
-    }
-
     public String getProperty(String key) {
         return properties.get(key);
     }

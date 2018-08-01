@@ -8,52 +8,52 @@ import java.util.Set;
 
 import org.junit.jupiter.api.*;
 
-public class ValidatorTest {
+class ValidatorTest {
 
     @Test
-    public void testValidateNumerals() {
+    void testValidateNumerals() {
         Validator validator = new Validator();
         Assertions.assertTrue(validator.validateNumerals("45.68"));
         Assertions.assertFalse(validator.validateNumerals("45.686"));
     }
 
     @Test
-    public void testValidateIP() {
+    void testValidateIP() {
         Validator validator = new Validator();
         Assertions.assertTrue(validator.validateIP("45.68.0.0"));
         Assertions.assertFalse(validator.validateIP("456.686.78.0"));
     }
 
     @Test
-    public void testValidatePort() {
+    void testValidatePort() {
         Validator validator = new Validator();
         Assertions.assertTrue(validator.validatePort("5670"));
         Assertions.assertFalse(validator.validatePort("75"));
     }
 
     @Test
-    public void testValidateFileName() {
+    void testValidateFileName() {
         Validator validator = new Validator();
         Assertions.assertTrue(validator.validateFileName(".fdrr5"));
         Assertions.assertFalse(validator.validateFileName("."));
     }
 
     @Test
-    public void testValidateAccountName() {
+    void testValidateAccountName() {
         Validator validator = new Validator();
         Assertions.assertTrue(validator.validateAccountName("."));
         Assertions.assertFalse(validator.validateAccountName("?f#"));
     }
 
     @Test
-    public void testValidateInitialBalance() {
+    void testValidateInitialBalance() {
         Validator validator = new Validator();
         Assertions.assertTrue(validator.validateInitialBalance("67"));
         Assertions.assertFalse(validator.validateInitialBalance("2"));
     }
 
     @Test
-    public void testValidateArgumentLength() {
+    void testValidateArgumentLength() {
         Validator validator = new Validator();
         final String strCharacter = "*";
 
@@ -82,7 +82,7 @@ public class ValidatorTest {
     }
 
     @Test
-    public void testCheckDuplicates() {
+    void testCheckDuplicates() {
         String strValid = "c";
         String strInvalid = "a";
         Set<String> strSet = new HashSet<String>(Arrays.asList("a", "g", "n"));
@@ -92,7 +92,7 @@ public class ValidatorTest {
     }
 
     @Test
-    public void testCheckOperations() {
+    void testCheckOperations() {
         Set<String> strSetValid = new HashSet<String>(Arrays.asList("a", "g"));
         Set<String> strSetInvalid = new HashSet<String>(Arrays.asList("a", "g", "w"));
         Validator validator = new Validator();

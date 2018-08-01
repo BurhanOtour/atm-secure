@@ -4,8 +4,8 @@ import org.apache.commons.cli.CommandLine;
 
 public class AtmInput {
 
-    private CommandLine commandLine;
-    private String PIN;
+    private final CommandLine commandLine;
+    private final String PIN;
 
     public AtmInput(CommandLine commandLine, String PIN) {
         this.commandLine = commandLine;

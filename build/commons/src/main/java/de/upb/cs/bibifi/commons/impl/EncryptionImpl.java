@@ -5,11 +5,7 @@ import de.upb.cs.bibifi.commons.IEncryption;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -18,10 +14,10 @@ import java.util.Base64;
 
 public class EncryptionImpl implements IEncryption {
 
-    private static String algoName = "AES";
+    private static final String algoName = "AES";
 
-   private static String transformation = "AES/CBC/PKCS5Padding";
- //   private static String transformation = "AES/ECB/NoPadding";
+    private static final String transformation = "AES/CBC/PKCS5Padding";
+
     private byte[] key;
 
     private static EncryptionImpl singleton;
@@ -33,7 +29,7 @@ public class EncryptionImpl implements IEncryption {
         if (singleton == null)
             singleton = new EncryptionImpl();
 
-        singleton.key =  Base64.getDecoder().decode(key);
+        singleton.key = Base64.getDecoder().decode(key);
         return singleton;
     }
 

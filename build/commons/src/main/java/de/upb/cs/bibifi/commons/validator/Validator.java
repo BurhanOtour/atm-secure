@@ -37,7 +37,7 @@ public class Validator {
         } catch (NumberFormatException e) {
 
         }
-        return numeral.matches(pattern.pattern()) ? amount <= max_amount : false;
+        return numeral.matches(pattern.pattern()) && amount <= max_amount;
     }
 
     /**
@@ -81,7 +81,7 @@ public class Validator {
      */
     public static boolean validateFileName(String fileName) {
         Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
-        return (fileName.length() <= 127 && !fileName.equals(".") && !fileName.equals("..")) ? pattern.matcher(fileName).matches() : false;
+        return (fileName.length() <= 127 && !fileName.equals(".") && !fileName.equals("..")) && pattern.matcher(fileName).matches();
     }
 
     /**
@@ -92,7 +92,7 @@ public class Validator {
      */
     public static boolean validateAccountName(String accountName) {
         Pattern pattern = Pattern.compile("[_\\-\\.0-9a-z]+$");
-        return accountName.length() < 123 ? pattern.matcher(accountName).matches() : false;
+        return accountName.length() < 123 && pattern.matcher(accountName).matches();
     }
 
     /**
@@ -108,7 +108,7 @@ public class Validator {
         } catch (NumberFormatException e) {
 
         }
-        return amount >= 10.0 ? true : false;
+        return amount >= 10.0;
     }
 
     /**
@@ -132,9 +132,9 @@ public class Validator {
 
         boolean match = false;
         for (String str : operations) {
-            if (options.contains(str) && match != true) {
+            if (options.contains(str) && !match) {
                 match = true;
-            } else if (options.contains(str) && match == true) {
+            } else if (options.contains(str) && match) {
                 match = false;
                 break;
             }
@@ -160,7 +160,7 @@ public class Validator {
      * @return
      */
     public static boolean validateArgumentLength(String[] args) {
-        return !Arrays.stream(args).anyMatch(arg -> arg.length() > 4096);
+        return Arrays.stream(args).noneMatch(arg -> arg.length() > 4096);
     }
 
     /**

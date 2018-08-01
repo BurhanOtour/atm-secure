@@ -1,18 +1,15 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
-import com.google.gson.Gson;
 import de.upb.cs.bibifi.bankapp.bank.IAuthFileContentGenerator;
 import de.upb.cs.bibifi.bankapp.bank.IBank;
 import de.upb.cs.bibifi.commons.constants.AppConstants;
 import de.upb.cs.bibifi.bankapp.data.Account;
-import de.upb.cs.bibifi.bankapp.exceptions.SystemException;
 import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.enums.RequestType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
@@ -22,8 +19,6 @@ public class Bank implements IBank {
     private BigDecimal currentBalance;
 
     private Account currentAccount;
-
-    private Gson gson = new Gson();
 
     private HashMap<String, Account> accounts = new HashMap<>();
 
@@ -47,7 +42,6 @@ public class Bank implements IBank {
 
     @Override
     public void startup(String authFileName) throws Exception {
-//        // @TODO check auth file name validity
         this.authFile = authFileName == null || authFileName.isEmpty() ? AppConstants.DEFAULT_AUTH_FILE_NAME : authFileName;
         if ((new File(this.authFile)).exists()) {
             throw new IllegalStateException("Auth file already exists");
@@ -55,14 +49,8 @@ public class Bank implements IBank {
         createAuthFile(this.authFile);
         System.out.println(AppConstants.BANK_CREATION_CONFIRMATION_MESSAGE);
         System.out.flush();
-        //this.authFile = authFileName;
     }
 
-    /**
-     * @param acc     the account name
-     * @param balance
-     * @return if the account creation protocol is respected it should return the pin back
-     */
     @Override
     public String createBalance(String acc, String balance) {
         Account account = accounts.get(acc);
@@ -155,8 +143,6 @@ public class Bank implements IBank {
     }
 
     private void createAuthFile(String authFileName) throws Exception {
-        // @TODO the one should be replaced by the read generator
-        // @TODO this could be moved later to Server
         IAuthFileContentGenerator generator = AuthFileContentGeneratorImpl.getGenerator();
         File authFile = new File(authFileName);
         FileUtils.copyInputStreamToFile(generator.generateAuthFileContent(), authFile);
