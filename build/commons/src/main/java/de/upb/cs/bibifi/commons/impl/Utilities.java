@@ -19,7 +19,7 @@ public class Utilities {
         return gson.fromJson(text, TransmissionPacket.class);
     }
     //Json Serializer
-    public static String Serializer (TransmissionPacket transmissionPacket){
+    public static String serializer (TransmissionPacket transmissionPacket){
         Gson gson = new Gson();
         return gson.toJson(transmissionPacket);
     }
