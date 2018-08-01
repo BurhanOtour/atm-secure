@@ -27,8 +27,7 @@ public class Server implements IServer {
     private IServerProcessor processor;
 
     private IEncryption encryption;
-    private String authFile = null;
-    private int port = 0;
+    private String authFile;
 
     public static void main(String[] args) {
 
@@ -61,9 +60,8 @@ public class Server implements IServer {
         }
     }
 
-    public Server(int port, String authFile) throws Exception {
+    private Server(int port, String authFile) throws Exception {
         this.authFile = authFile;
-        this.port = port;
         this.serverSocket = new ServerSocket(port);
         this.processor = ServerProcessor.getServerProcessor();
         Bank.getBank().startup(authFile);
@@ -98,20 +96,23 @@ public class Server implements IServer {
                 }
 
                 //Take decrypted msg and make pkt
-                String json = decryptMsg.toString();
-                TransmissionPacket requestPkt = Utilities.deserializer(json);
-                Response response = processor.executeOperation(requestPkt);
+                if (decryptMsg != null) {
+                    String json = decryptMsg.toString();
 
-                if (response.getCode() == 0) {
-                    System.out.println(response.getMessage());
-                    System.out.flush();
+                    TransmissionPacket requestPkt = Utilities.deserializer(json);
+                    Response response = processor.executeOperation(requestPkt);
+
+                    if (response.getCode() == 0) {
+                        System.out.println(response.getMessage());
+                        System.out.flush();
+                    }
+
+                    Gson gson = new Gson();
+                    String resJson = gson.toJson(response);
+                    String encryptResponse = encryption.encryptMessage(resJson);
+                    print.println(encryptResponse);
+                    print.flush();
                 }
-
-                Gson gson = new Gson();
-                String resJson = gson.toJson(response);
-                String encryptResponse = encryption.encryptMessage(resJson);
-                print.println(encryptResponse);
-                print.flush();
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);
                 fail();
@@ -120,17 +121,11 @@ public class Server implements IServer {
                 System.out.flush();
                 print.flush();
                 sock.close();
-                continue;
             }
         }
     }
 
-    private boolean validTransmission(TransmissionPacket packet) {
-        return true;
-    }
-
-
-    public void cleanup() throws IOException {
+    private void cleanup() throws IOException {
         FileUtils.forceDelete(new File(authFile));
     }
 
@@ -146,7 +141,7 @@ public class Server implements IServer {
         }
     }
 
-    public void fail() {
+    private void fail() {
         System.err.println(255);
     }
 }

@@ -1,8 +1,6 @@
 package de.upb.cs.bibifi.commons;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * Interface for conveniently storing any representable in a stream securely

@@ -15,22 +15,21 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
 
 public class Client implements IClient {
 
-    private String cardFileName;
-    private String ip;
-    private Integer port;
+    private final String cardFileName;
+    private final String ip;
+    private final Integer port;
 
-    public Client(String cardFileName, String ip, Integer port) {
+    private Client(String cardFileName, String ip, Integer port) {
         this.cardFileName = cardFileName;
         this.ip = ip;
         this.port = port;
     }
 
-    public void clientRequest(TransmissionPacket request) throws Exception {
+    private void clientRequest(TransmissionPacket request) throws Exception {
 
         String jsonRequest = Utilities.serializer(request);
 
@@ -69,10 +68,10 @@ public class Client implements IClient {
                     System.out.flush();
                     printWriter.flush();
                     sock.close();
-                    return;
                 }
-            } else
+            } else{
                 System.exit(63);
+            }
         } catch (IllegalBlockingModeException | IllegalArgumentException | IOException | InterruptedException ex) {
             System.err.println(63);
             System.err.println(ex.getMessage());
@@ -106,11 +105,8 @@ public class Client implements IClient {
         }
     }
 
-    public void fail() {
+    private void fail() {
         System.exit(255);
     }
 
-    public void networkFail() {
-        System.exit(63);
-    }
 }

@@ -17,8 +17,6 @@ public class ServerProcessor implements IServerProcessor {
 
     private static ServerProcessor processor;
 
-    private Gson gson = new Gson();
-
     private ServerProcessor() {
 
     }

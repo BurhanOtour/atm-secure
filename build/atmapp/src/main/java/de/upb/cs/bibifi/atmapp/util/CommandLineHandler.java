@@ -6,7 +6,6 @@ import de.upb.cs.bibifi.commons.constants.SharedConstants;
 import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
-import de.upb.cs.bibifi.commons.validator.InputPatternChecker;
 import de.upb.cs.bibifi.commons.validator.Validator;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
@@ -21,18 +20,17 @@ public class CommandLineHandler {
 
     private CommandLine commandLine;
 
-    private String[] args;
+    private final String[] args;
 
     private TransmissionPacket packet;
 
     public CommandLineHandler(String[] args) {
         this.args = args;
-        if (Arrays.stream(args).anyMatch(x -> x.isEmpty() || x == null))
+        if (Arrays.stream(args).anyMatch(x -> x == null || x.isEmpty()))
             Validator.fail();
 
         init();
 
-        //check arguments length
         if (!Validator.validateArgumentLength(this.args))
             Validator.fail();
     }
@@ -41,16 +39,14 @@ public class CommandLineHandler {
 
     private String ip;
 
-    Integer port;
+    private Integer port;
 
     /**
      * Initialize Atm and validate parameters
      */
-    public void init() {
+    private void init() {
 
         CommandLineParser commandLineParser = new DefaultParser();
-
-        HelpFormatter formatter = new HelpFormatter();
 
         Options options = new Options();
 
@@ -130,8 +126,6 @@ public class CommandLineHandler {
     }
 
     public CommandLineHandler processCommandLineArguments() {
-
-        Option[] options = commandLine.getOptions();
         Set<String> opts = new HashSet<>();
 
         Arrays.stream(commandLine.getOptions()).forEach(option -> {

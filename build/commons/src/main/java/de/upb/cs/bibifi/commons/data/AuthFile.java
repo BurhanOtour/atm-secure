@@ -7,10 +7,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class AuthFile {
-    private String key;
-    private String salt;
+    private final String key;
+    private final String salt;
 
-    public AuthFile(String key, String salt) {
+    private AuthFile(String key, String salt) {
         this.key = key;
         this.salt = salt;
     }
@@ -46,9 +46,7 @@ public class AuthFile {
             return false;
 
         AuthFile that = (AuthFile) obj;
-        if (this.key != that.key || !this.salt.equals(that.salt))
-            return false;
-        return true;
+        return this.key.equals(that.key) && this.salt.equals(that.salt);
     }
 
     @Override

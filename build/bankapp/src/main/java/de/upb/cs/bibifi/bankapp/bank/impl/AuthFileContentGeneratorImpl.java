@@ -7,7 +7,6 @@ import org.json.JSONObject;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Random;
 

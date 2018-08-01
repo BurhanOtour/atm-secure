@@ -1,16 +1,14 @@
 package de.upb.cs.bibifi.commons;
 
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EncryptionTest {
 
     @Test
-    public void EncryptionTest() throws Exception {
+    public void encryptionTest() throws Exception {
         String helloMessage = "Hello encryption";
         String key = "PrvQH+6bvZPJrqR02ntOFw";
         IEncryption encryption = EncryptionImpl.initialize(key);
