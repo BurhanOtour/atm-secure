@@ -32,7 +32,7 @@ public class Client implements IClient {
 
     public void clientRequest(TransmissionPacket request) throws Exception {
 
-        String jsonRequest = Utilities.Serializer(request);
+        String jsonRequest = Utilities.serializer(request);
 
         try {
             Socket sock = new Socket(ip, port);
