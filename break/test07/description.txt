@@ -1,0 +1,1 @@
+..card and ...card should not be accepted as valid card names
