@@ -1,0 +1,1 @@
+Takes an invalid input "-s some.auth" while creating account.
