@@ -1,0 +1,1 @@
+It takes invalid balance for deposit to an account.
