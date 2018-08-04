@@ -1,0 +1,8 @@
+{
+  "type": "correctness",
+  "target_team": 6,
+  "inputs": [
+    {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "sepide", "-n", "10.00"],"base64":false},
+    {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "sepide", "-d", "10.00", "-s", "sepide.auth"]}
+  ]
+}
