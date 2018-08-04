@@ -1,0 +1,11 @@
+{
+  "type": "correctness",
+  "target_team": 6,
+  "inputs": [
+    {"input":["-p", "%PORT%", "-i", "127.0.0.a", "-a", ".ted", "-n", "17.00"],"base64":false},
+    {"input":["-p", "%PORT%", "-i", "a.127.0.0", "-a", ".ted", "-n", "17.00"],"base64":false},
+    {"input":["-p", "%PORT%", "-i", "a..127.0", "-a", ".ted", "-n", "17.00"],"base64":false},
+    {"input":["-p", "%PORT%", "-i", ".A.A.", "-a", ".ted", "-n", "17.00"],"base64":false},
+    {"input":["-p", "%PORT%", "-i", "128.A.13.$", "-a", ".ted", "-n", "17.00"],"base64":false}
+  ]
+}
