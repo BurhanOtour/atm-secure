@@ -1,0 +1,1 @@
+Incorrect/no exit code for entering invalid input with -s flag.
