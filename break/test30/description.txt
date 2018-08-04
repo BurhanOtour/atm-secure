@@ -1,0 +1,1 @@
+Passing no arguments to ATM should result in 255 error not exception
