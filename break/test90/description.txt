@@ -1,0 +1,1 @@
+intercept packet and drop response and check balance
