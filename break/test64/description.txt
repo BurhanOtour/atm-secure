@@ -1,0 +1,1 @@
+Doesn't exit properly when the name has an '&' character.
