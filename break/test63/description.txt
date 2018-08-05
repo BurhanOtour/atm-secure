@@ -1,0 +1,1 @@
+Accepts invalid name while creating an account, accepts character '*' in name.
