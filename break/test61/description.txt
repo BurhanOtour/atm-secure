@@ -1,0 +1,1 @@
+Can't run any command after entering a wrong input(-s) while creating account. Bank says protocol_error and hangs up after that.
