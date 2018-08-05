@@ -1,0 +1,1 @@
+Rejects a valid card file name "..." and any other card file name as well.
