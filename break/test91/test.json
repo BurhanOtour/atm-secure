@@ -5,6 +5,5 @@
         {"input":["-p", "%PORT%", "-i", "%IP%","-a", "ted", "-n", "40.00"],"base64":false},
         {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "ted", "-w", "10.00"]},
         {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "ted", "-w", "10.00"]},
-        {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "ted", "-g"]},
-    ]
+        {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "ted", "-g"]}
 }
