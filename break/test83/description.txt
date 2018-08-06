@@ -1,0 +1,1 @@
+Does not accept a valid name(for example "-teddy"), when specifying a card file name explicitly. (for example -c card.card)
