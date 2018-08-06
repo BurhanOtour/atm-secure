@@ -1,0 +1,1 @@
+Creating an account with a card file once, and then creating an account with the same card file name in the place of auth file name (-s "something") leads to an unexpected error.
