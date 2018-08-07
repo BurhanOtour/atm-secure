@@ -1,0 +1,1 @@
+"-" is a valid char for account name
