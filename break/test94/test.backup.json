@@ -2,6 +2,6 @@
     "type": "correctness",
     "target_team": 12,
     "inputs": [
-         {"input":["-p", "-i", "%IP%", "-a", "ted", "-n","10.00","-s"],"base64":false}
+         {"input":["-p", "-i", "%IP%", "-a", "ted", "-n","10.00"],"base64":false}
        ]
 }
