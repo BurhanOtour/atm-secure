@@ -1,0 +1,1 @@
+Input validation for auth_file is not working if -s parameter is specified
