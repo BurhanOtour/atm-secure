@@ -127,8 +127,6 @@ if __name__ == '__main__':
     parser.add_argument('-c', type=str, default="127.0.0.1", help="command server")
     parser.add_argument('-d', type=int, default=5000, help="command port")
     args = parser.parse_args()
-    global command_server_port
-    global command_server_ip
     command_server_ip = args.c
     command_server_port = args.d
 
