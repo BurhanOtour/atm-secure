@@ -1,0 +1,1 @@
+After droping one transaction it produced protocol error and disregard that last transaction as well as the previous. 
