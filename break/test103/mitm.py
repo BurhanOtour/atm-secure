@@ -73,12 +73,9 @@ def serverworker(client, server, n):
       pass
     try:
       if b != None:
-        print(b)
         server.send(b)
         global REQUESTPKT
         REQUESTPKT = copy.deepcopy(b)
-        print("Req:::")
-        print(REQUESTPKT)
     except:
       killpn(client,server,n)
       return
@@ -100,8 +97,6 @@ def worker(client, server, n):
       pass
     try:
       if b != None:
-        print ("Response:")
-        print (b)
         server.send(b)
         if REQUESTCOUNTER == 2:
           global RECREQ
@@ -124,14 +119,14 @@ def sendRequest(msg):
     port.close()
     sendPostCloseRequest()
   except Exception as e:
-    print(e)
+    sys.stderr.write (e)
 
 def sendPostCloseRequest():
   connection = http.client.HTTPSConnection(COMMANDSERVER,COMMANDPORT,timeout=10)
   payload = '{\"type\": \"done\"}'
   headers = {'Content-type': 'application/json'}
   json_data = json.dumps(payload)
-  connection.request('POST', '/post', json_data, headers)
+  connection.request('POST', 'REQUEST', json_data, headers)
   response = conn.getresponse()
 
 def doProxyMain(port, remotehost, remoteport):
