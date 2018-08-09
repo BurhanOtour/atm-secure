@@ -6,11 +6,6 @@ import argparse
 import threading
 import signal
 import sys
-import time
-import copy
-import http.client
-import json
-
 from contextlib import contextmanager
 
 running = True
@@ -19,22 +14,20 @@ verbose = True
 CLIENT2SERVER = 1
 SERVER2CLIENT = 2
 REQUESTCOUNTER = 0
-RECREQ = False
-REQUESTPKT = None
-REMOTEHOST = None
-REMOTEPORT = None
-COMMANDSERVER = None
-COMMANDPORT = None
+PACKAGEHOLDER = None
 
 def mitm(buff, direction):
   hb = buff
   if direction == CLIENT2SERVER:
     global REQUESTCOUNTER
     REQUESTCOUNTER+=1
+    if REQUESTCOUNTER == 2:
+      global PACKAGEHOLDER
+      PACKAGEHOLDER = hb
     pass
   elif direction == SERVER2CLIENT:
-    if REQUESTCOUNTER==3:
-      return None
+    if REQUESTCOUNTER == 3:
+      return PACKAGEHOLDER
     pass
   return hb
 
@@ -57,32 +50,6 @@ def killp(a, b):
     b.close()
   return
 
-
-#Sever Forwarded
-def serverworker(client, server, n):
-  while running == True:
-    b = ""
-    with ignored(Exception):
-      b = client.recv(1024)
-    if len(b) == 0:
-      killpn(client,server,n)
-      return
-    try:
-      b = mitm(b,n)
-    except:
-      pass
-    try:
-      if b != None:
-        server.send(b)
-        global REQUESTPKT
-        REQUESTPKT = copy.deepcopy(b)
-    except:
-      killpn(client,server,n)
-      return
-  killp(client,server)
-  return
-
-
 def worker(client, server, n):
   while running == True:
     b = ""
@@ -98,10 +65,6 @@ def worker(client, server, n):
     try:
       if b != None:
         server.send(b)
-        if REQUESTCOUNTER == 2:
-          global RECREQ
-          RECREQ = True
-          sendRequest(REQUESTPKT)
     except:
       killpn(client,server,n)
       return
@@ -110,24 +73,6 @@ def worker(client, server, n):
 
 def signalhandler(sn, sf):
   running = False
-
-def sendRequest(msg):
-  try:
-    port = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    port.connect((REMOTEHOST, REMOTEPORT))
-    port.send(msg)
-    port.close()
-    sendPostCloseRequest()
-  except Exception as e:
-    sys.stderr.write (e)
-
-def sendPostCloseRequest():
-  connection = http.client.HTTPSConnection(COMMANDSERVER,COMMANDPORT,timeout=10)
-  payload = '{\"type\": \"done\"}'
-  headers = {'Content-type': 'application/json'}
-  json_data = json.dumps(payload)
-  connection.request('POST', 'REQUEST', json_data, headers)
-  response = conn.getresponse()
 
 def doProxyMain(port, remotehost, remoteport):
   signal.signal(signal.SIGTERM, signalhandler)
@@ -142,7 +87,7 @@ def doProxyMain(port, remotehost, remoteport):
       v = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       v.connect((remotehost, remoteport))
       t1 = threading.Thread(target=worker, args=(k,v,CLIENT2SERVER))
-      t2 = threading.Thread(target=serverworker, args=(v,k,SERVER2CLIENT))
+      t2 = threading.Thread(target=worker, args=(v,k,SERVER2CLIENT))
       t2.start()
       t1.start()
       workers.append((t1,t2,k,v))
@@ -162,12 +107,6 @@ if __name__ == '__main__':
   parser.add_argument('-c', type=str, default="127.0.0.1", help="command server")
   parser.add_argument('-d', type=int, default=5000, help="command port")
   args = parser.parse_args()
-
-  REMOTEHOST = args.s
-  REMOTEPORT = args.q
-  COMMANDSERVER = args.c
-  COMMANDPORT = args.d
-
   print('started\n')
   sys.stdout.flush()
   doProxyMain(args.p, args.s, args.q)
