@@ -31,7 +31,7 @@ def mitm(buff, direction):
     hb = buff 
     if direction == CLIENT2SERVER:
         request = json.loads(hb)
-        if request['mode'] == 'new':
+        if request['mode'] != None && request['mode'] == 'new':
             account = request['account'] 
             sendLearnedAccountName(account)
             sendDoneRequest()
