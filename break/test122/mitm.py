@@ -25,17 +25,20 @@ def mitm(buff, direction):
     global counter
     hb = buff 
 
-    if direction == CLIENT2SERVER:
-        if success_message!=None and ack_message==None:
-            ack_message = hb
-    elif direction == SERVER2CLIENT:
-        if success_message==None:
-            success_message = hb
-    if success_message!=None and direction==SERVER2CLIENT:
-        counter += 1
-        return success_message
+    if counter>3:
+        sendDoneequest()
     else:
-        return hb
+        if direction == CLIENT2SERVER:
+            if success_message!=None and ack_message==None:
+                ack_message = hb
+        elif direction == SERVER2CLIENT:
+            if success_message==None:
+                success_message = hb
+        if success_message!=None and direction==SERVER2CLIENT:
+            counter += 1
+            return success_message
+        else:
+            return hb
 
 
 @contextmanager

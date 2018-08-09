@@ -1,0 +1,2 @@
+The same success message is always used across all transactions when the bank want to inform the atm of a succesful operation.
+Basically, we can just copy this message and resend it even when certain transaction is invalid 
