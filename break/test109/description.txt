@@ -1,0 +1,1 @@
+While replacing fake packet in the response, bank does not rollback. And client does not exit with appropriate exit code.
