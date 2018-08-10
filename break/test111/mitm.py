@@ -6,6 +6,7 @@ import argparse
 import threading
 import signal
 import sys
+import http.client
 from contextlib import contextmanager
 
 running = True
@@ -73,6 +74,14 @@ def worker(client, server, n):
 
 def signalhandler(sn, sf):
   running = False
+
+def sendPostCloseRequest():
+  connection = http.client.HTTPSConnection(COMMANDSERVER,COMMANDPORT,timeout=10)
+  payload = '{\"type\": \"done\"}'
+  headers = {'Content-type': 'application/json'}
+  json_data = json.dumps(payload)
+  connection.request('POST', 'REQUEST', json_data, headers)
+  response = conn.getresponse()
 
 def doProxyMain(port, remotehost, remoteport):
   signal.signal(signal.SIGTERM, signalhandler)
