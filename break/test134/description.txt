@@ -1,0 +1,2 @@
+Since team 6 doesn't hide any information in the packets traveling over 
+the wire it is quite easy to actually extract valuable information from them. In this case, amount
