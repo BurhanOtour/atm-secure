@@ -1,0 +1,1 @@
+By send an empty packet to the bank. The bank crashes.
