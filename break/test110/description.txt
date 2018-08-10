@@ -1,0 +1,1 @@
+ATM doesn't receive confirmation of second withdraw, when the sent packet is faked. The balance gets deducted from the bank, client doesn't receive a confirmation.
