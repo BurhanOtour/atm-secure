@@ -1,0 +1,1 @@
+ATM doesn't receive confirmation of first request(account creation). After this, even the withdraw operations after this don't work.
