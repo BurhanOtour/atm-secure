@@ -7,7 +7,6 @@ import threading
 import signal
 import sys
 from copy import *
-from contextlib import contextmanager
 
 running = True
 verbose = True
@@ -116,4 +115,3 @@ if __name__ == '__main__':
   print('started\n')
   sys.stdout.flush()
   doProxyMain(args.p, args.s, args.q)
-
