@@ -1,0 +1,1 @@
+The team hardcoded the AES (key,iv) pair in their code. A way to perform a confidentiality break
