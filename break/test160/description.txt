@@ -1,0 +1,1 @@
+hardcoding AIE (key,iv) pair make it possible to reverse the encryption on the MITM code and extract valuable information like the account
