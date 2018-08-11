@@ -6,6 +6,8 @@ import argparse
 import threading
 import signal
 import sys
+import requests as req
+import json
 from copy import *
 from contextlib import contextmanager
 
@@ -18,7 +20,7 @@ OLDRESPONSE = None
 COUNTER = 0;
 
 
-def mitm(buff, direction):
+def mitm(buff, direction, commandServerIP, commandServerPort):
   hb = buff
   global OLDRESPONSE
   global COUNTER
@@ -32,6 +34,8 @@ def mitm(buff, direction):
       try:
         return OLDRESPONSE
       except Exception as e: print(e)
+    if COUNTER == 7:
+      sendDoneSignal(commandServerIP, commandServerPort)
     if COUNTER == 3:
       OLDRESPONSE = hb
     pass
@@ -56,7 +60,7 @@ def killp(a, b):
     b.close()
   return
 
-def worker(client, server, n):
+def worker(client, server, n, commandServerIP, commandServerPort):
   while running == True:
     b = ""
     with ignored(Exception):
@@ -65,7 +69,7 @@ def worker(client, server, n):
       killpn(client,server,n)
       return
     try:
-      b = mitm(b,n)
+      b = mitm(b,n, commandServerIP, commandServerPort)
     except:
       pass
     try:
@@ -80,7 +84,17 @@ def worker(client, server, n):
 def signalhandler(sn, sf):
   running = False
 
-def doProxyMain(port, remotehost, remoteport):
+def getDoneCommand():
+    command = {"type": "done"}
+    return json.dumps(command)
+
+
+def sendDoneSignal(command_server_ip,command_server_port):
+    payload = {'REQUEST':getDoneCommand()}
+    headers = {'Content-Type' : 'application/x-www-form-urlencoded','Accept':'*/*'}
+    r = req.post("http://"+command_server_ip+":"+str(command_server_port), data = payload, headers = headers)
+
+def doProxyMain(port, remotehost, remoteport, commandServerIP, commandServerPort):
   signal.signal(signal.SIGTERM, signalhandler)
   try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -92,8 +106,8 @@ def doProxyMain(port, remotehost, remoteport):
       k,a = s.accept()
       v = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       v.connect((remotehost, remoteport))
-      t1 = threading.Thread(target=worker, args=(k,v,CLIENT2SERVER))
-      t2 = threading.Thread(target=worker, args=(v,k,SERVER2CLIENT))
+      t1 = threading.Thread(target=worker, args=(k,v,CLIENT2SERVER,commandServerIP,commandServerPort))
+      t2 = threading.Thread(target=worker, args=(v,k,SERVER2CLIENT,commandServerIP,commandServerPort))
       t2.start()
       t1.start()
       workers.append((t1,t2,k,v))
@@ -115,5 +129,5 @@ if __name__ == '__main__':
   args = parser.parse_args()
   print('started\n')
   sys.stdout.flush()
-  doProxyMain(args.p, args.s, args.q)
+  doProxyMain(args.p, args.s, args.q, args.c, args.d)
 
