@@ -1,0 +1,2 @@
+Team 6 store the account name value as a card name value and since the team send trasactions' request without
+encryption. It is straight forward to show card content
