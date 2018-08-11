@@ -34,8 +34,8 @@ def mitm(buff, direction, commandServerIP, commandServerPort):
       try:
         return OLDRESPONSE
       except Exception as e: print(e)
-    if COUNTER == 7:
-      sendDoneSignal(commandServerIP, commandServerPort)
+    # if COUNTER == 7:
+    #   sendDoneSignal(commandServerIP, commandServerPort)
     if COUNTER == 3:
       OLDRESPONSE = hb
     pass
