@@ -1,0 +1,1 @@
+Sending a specific request from atm twice to the bank using mitm. For example, withdrawal is done twice although atm requested it only once.
