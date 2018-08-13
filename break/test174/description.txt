@@ -1,0 +1,1 @@
+"-" is a valid character for account name, but when I try to create an account with name, for example "-ted", ATM returns an exit code of 255.
