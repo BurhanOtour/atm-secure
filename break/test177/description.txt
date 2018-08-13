@@ -1,0 +1,1 @@
+Doesn't give proper exit code (255) for an invalid acount name.
