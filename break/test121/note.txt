@@ -1,0 +1,9 @@
+Hi Martin, 
+
+I just re-added the code since it was deleted. 
+The However, the test happened earlier because 
+We asked you to rerun a test with deleted code in git to learn how the infrastructure was behaving and it was succeeded. 
+
+So I was just checking and I saw that the code was missing so I added it as it is. 
+
+Burhan.
