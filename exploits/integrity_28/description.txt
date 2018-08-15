@@ -1,0 +1,12 @@
+Message Swapping:
+===================
+
+This is a integrity break implementation.
+
+Steps:-
+1- Atm creates account "ted".
+2- Atm creates account "martin"
+3- Atm checks balance for "ted". Mitm save this response.
+4- Atm checks balance fro "martin". Mitm sends back previous response.
+
+As a result, "martin" see "ted"'s balance.

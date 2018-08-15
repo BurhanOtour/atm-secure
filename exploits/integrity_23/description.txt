@@ -1,0 +1,1 @@
+You don't have any protection against recording and resending messages. So I simply can record a transaction and reuse it without need to have access to the auth file or the card file.

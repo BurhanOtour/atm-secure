@@ -1,0 +1,2 @@
+default:
+	echo 1
