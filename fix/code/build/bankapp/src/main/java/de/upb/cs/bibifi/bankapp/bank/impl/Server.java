@@ -76,50 +76,20 @@ public class Server implements IServer {
 
     @Override
     public void start() throws Exception {
-        PrintWriter print = null;
         while (true) {
             Socket sock = null;
             try {
                 //Open Socket for accepting request
                 sock = serverSocket.accept();
-                OutputStream out = sock.getOutputStream();
-                print = new PrintWriter(out, true);
+                Thread thread = new ClientHandler(sock, this.authFile);
+                thread.start();
 
-                sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
-                InputStream istream = sock.getInputStream();
-                BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-                String receiveMessage, decryptMsg = null;
-
-                //Receive msg and decrypt the message
-                if ((receiveMessage = receiveRead.readLine()) != null) {
-                    decryptMsg = encryption.decryptMessage(receiveMessage);
-                }
-
-                //Take decrypted msg and make pkt
-                if (decryptMsg != null) {
-                    String json = decryptMsg.toString();
-
-                    TransmissionPacket requestPkt = Utilities.deserializer(json);
-                    Response response = processor.executeOperation(requestPkt);
-
-                    if (response.getCode() == 0) {
-                        System.out.println(response.getMessage());
-                        System.out.flush();
-                    }
-
-                    Gson gson = new Gson();
-                    String resJson = gson.toJson(response);
-                    String encryptResponse = encryption.encryptMessage(resJson);
-                    print.println(encryptResponse);
-                    print.flush();
-                }
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);
                 fail();
             } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
                 System.out.println("protocol_error");
                 System.out.flush();
-                print.flush();
                 sock.close();
             }
         }

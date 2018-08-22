@@ -1,6 +1,8 @@
 package de.upb.cs.bibifi.commons.impl;
 
 import com.google.gson.Gson;
+import de.upb.cs.bibifi.commons.dto.Acknowledgement;
+import de.upb.cs.bibifi.commons.dto.Response;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 
 import java.io.ByteArrayInputStream;
@@ -16,9 +18,18 @@ public class Utilities {
         return gson.fromJson(text, TransmissionPacket.class);
     }
 
+    public static Response deserializeResponse(String text) {
+        Gson gson = new Gson();
+        return gson.fromJson(text, Response.class);
+    }
+
     //Json Serializer
     public static String serializer (TransmissionPacket transmissionPacket){
         Gson gson = new Gson();
         return gson.toJson(transmissionPacket);
+    }
+    public static String serializer (Acknowledgement ack){
+        Gson gson = new Gson();
+        return gson.toJson(ack);
     }
 }

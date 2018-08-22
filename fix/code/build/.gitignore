@@ -1,0 +1,13 @@
+# Created by https://www.gitignore.io/api/maven,intellij+all
+
+### Intellij ###
+# IDEA files in the top-level directory is irrelevant #
+/.idea/
+/atmapp/target
+/bankapp/target
+/commons/target
+
+/*.iml
+/atmapp/*.iml
+/bankapp/*.iml
+/commons/*.iml
