@@ -47,13 +47,8 @@ public class ClientHandler extends Thread {
             if (recvAckId != null || !recvAckId.isEmpty()) {
                 processedPktList.add(recvAckId);
             }
-
-
-
         } catch (Exception e) {
             Bank.getBank().undo();
-            service.shutdownNow();
-
             System.err.println("Roll back request and shutdown ack handler");
             System.err.flush();
 
@@ -76,8 +71,7 @@ public class ClientHandler extends Thread {
 
                 // Check for replay attack
                 if (processedPktList.contains(requestPkt.getPacketId())) {
-                    System.out.println("protocol_error");
-                    System.out.flush();
+                    throw new Exception("Duplicate packet was sent.");
                 }
 
                 // Add to the processing list to denote that packet is already processed;
@@ -97,15 +91,19 @@ public class ClientHandler extends Thread {
                 waitForAcknowledgement(response.getResponseId());
 
             } else {
-                System.out.println("protocol_error");
-                System.out.flush();
+                throw new Exception("Decryption Error");
             }
 
-            this.inputStream.close();
-            this.outputStream.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("protocol_error");
+            System.out.flush();
+        } finally {
+            try {
+                this.inputStream.close();
+                this.outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

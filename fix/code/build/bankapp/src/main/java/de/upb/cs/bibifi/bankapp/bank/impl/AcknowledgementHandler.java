@@ -5,7 +5,6 @@ import de.upb.cs.bibifi.commons.IEncryption;
 import de.upb.cs.bibifi.commons.dto.Acknowledgement;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -25,7 +24,7 @@ public class AcknowledgementHandler implements Callable {
 
 
     @Override
-    public String call() throws IOException {
+    public String call() throws Exception {
         String receivedAckId = null;
         try {
             String receiveMessage = dataInputStream.readUTF();
@@ -37,12 +36,12 @@ public class AcknowledgementHandler implements Callable {
                 Acknowledgement ack = gson.fromJson(ackMessage, Acknowledgement.class);
 
                 if (processedList.contains(ack.getAckId()) || !ack.getResponseId().equals(requireResponseId)) {
-                    System.out.println("protocol_error");
-                    System.out.flush();
+                    throw new Exception("Duplicate or wrong ack was sent");
+                } else {
+                    receivedAckId = ack.getAckId();
                 }
-                receivedAckId = ack.getAckId();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw e;
         }
         return receivedAckId;
