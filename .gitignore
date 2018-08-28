@@ -3,3 +3,4 @@
 ### Intellij ###
 # IDEA files in the top-level directory is irrelevant #
 /.idea/
+/break/

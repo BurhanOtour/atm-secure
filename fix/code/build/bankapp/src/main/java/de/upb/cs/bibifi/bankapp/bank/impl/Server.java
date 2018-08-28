@@ -19,6 +19,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
+import java.util.ArrayList;
 
 
 public class Server implements IServer {
@@ -28,6 +29,10 @@ public class Server implements IServer {
 
     private IEncryption encryption;
     private String authFile;
+
+    private Socket sock;
+
+    private ArrayList<String> processedPktList = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -55,6 +60,9 @@ public class Server implements IServer {
             IServer server = new Server(Integer.parseInt(commandLine.getOptionValue("port", String.valueOf(AppConstants.DEFAULT_PORT_NUMBER)))
                     , commandLine.getOptionValue("authfile", AppConstants.DEFAULT_AUTH_FILE_NAME));
             server.start();
+        } catch (IOException e) {
+            System.out.println("protocol error");
+            System.out.flush();
         } catch (Exception e) {
             System.exit(255);
         }
@@ -76,52 +84,55 @@ public class Server implements IServer {
 
     @Override
     public void start() throws Exception {
-        PrintWriter print = null;
         while (true) {
-            Socket sock = null;
             try {
-                //Open Socket for accepting request
-                sock = serverSocket.accept();
-                OutputStream out = sock.getOutputStream();
-                print = new PrintWriter(out, true);
-
-                sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
-                InputStream istream = sock.getInputStream();
-                BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-                String receiveMessage, decryptMsg = null;
-
-                //Receive msg and decrypt the message
-                if ((receiveMessage = receiveRead.readLine()) != null) {
-                    decryptMsg = encryption.decryptMessage(receiveMessage);
-                }
-
-                //Take decrypted msg and make pkt
-                if (decryptMsg != null) {
-                    String json = decryptMsg.toString();
-
-                    TransmissionPacket requestPkt = Utilities.deserializer(json);
-                    Response response = processor.executeOperation(requestPkt);
-
-                    if (response.getCode() == 0) {
-                        System.out.println(response.getMessage());
-                        System.out.flush();
-                    }
-
-                    Gson gson = new Gson();
-                    String resJson = gson.toJson(response);
-                    String encryptResponse = encryption.encryptMessage(resJson);
-                    print.println(encryptResponse);
-                    print.flush();
-                }
+                processRequest();
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);
                 fail();
-            } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
+            } catch (IOException ex) {
+                if (sock != null) {
+                    sock.close();
+                }
                 System.out.println("protocol_error");
                 System.out.flush();
-                print.flush();
-                sock.close();
             }
+        }
+    }
+
+
+    public void processRequest() throws IOException {
+        sock = serverSocket.accept();
+        sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
+        DataInputStream inputStream = new DataInputStream(sock.getInputStream());
+        DataOutputStream outputStream = new DataOutputStream(sock.getOutputStream());
+
+        String receiveMessage = inputStream.readUTF();
+        String decryptMsg = encryption.decryptMessage(receiveMessage);
+        //Take decrypted msg and make pkt
+        if (decryptMsg != null) {
+            TransmissionPacket requestPkt = Utilities.deserializer(decryptMsg);
+
+            // Check for replay attack
+            if (processedPktList.contains(requestPkt.getPacketId())) {
+                System.out.println("protocol error");
+                System.out.flush();
+                return;
+            }
+
+            // Add to the processing list to denote that packet is already processed;
+            processedPktList.add(requestPkt.getPacketId());
+            Response response = processor.executeOperation(requestPkt);
+            if (response.getCode() == 0) {
+                System.out.println(response.getMessage());
+                System.out.flush();
+            }
+
+            Gson gson = new Gson();
+            String resJson = gson.toJson(response);
+            String encryptResponse = encryption.encryptMessage(resJson);
+            outputStream.writeUTF(encryptResponse);
+            sock.close();
         }
     }
 
