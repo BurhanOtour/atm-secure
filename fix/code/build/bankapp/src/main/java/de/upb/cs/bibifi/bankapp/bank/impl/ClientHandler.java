@@ -38,27 +38,6 @@ public class ClientHandler extends Thread {
         this.encryption = EncryptionImpl.initialize(AuthFile.getAuthFile(authFile).getKey());
     }
 
-    private void waitForAcknowledgement(String packetId) throws IOException {
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        AcknowledgementHandler handler = new AcknowledgementHandler(inputStream, encryption, processedPktList, packetId);
-        try {
-            Future<String> f = service.submit(handler);
-            String recvAckId = f.get(AppConstants.ACK_TIMEOUT, TimeUnit.SECONDS);     // Wait for Ack max for 10 seconds
-            if (recvAckId != null || !recvAckId.isEmpty()) {
-                processedPktList.add(recvAckId);
-            }
-        } catch (Exception e) {
-            Bank.getBank().undo();
-            System.err.println("Roll back request and shutdown ack handler");
-            System.err.flush();
-
-            System.out.println("protocol_error");
-            System.out.flush();
-        } finally {
-            service.shutdownNow();
-        }
-    }
-
     @Override
     public void run() {
         try {
@@ -86,9 +65,6 @@ public class ClientHandler extends Thread {
                 String resJson = gson.toJson(response);
                 String encryptResponse = encryption.encryptMessage(resJson);
                 outputStream.writeUTF(encryptResponse);
-
-                //Wait for Ack
-                waitForAcknowledgement(response.getResponseId());
 
             } else {
                 throw new Exception("Decryption Error");
