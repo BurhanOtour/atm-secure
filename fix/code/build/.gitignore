@@ -3,4 +3,11 @@
 ### Intellij ###
 # IDEA files in the top-level directory is irrelevant #
 /.idea/
-/break/
+/atmapp/target
+/bankapp/target
+/commons/target
+
+/*.iml
+/atmapp/*.iml
+/bankapp/*.iml
+/commons/*.iml
