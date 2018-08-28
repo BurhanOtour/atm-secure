@@ -97,10 +97,7 @@ public class Client implements IClient {
             //Update
             recvPktList.add(responseObject.getResponseId());
             //Send Acknowledgement
-            Acknowledgement ack = new Acknowledgement(responseObject.getResponseId());
-            String acknowledgement = Utilities.serializer(ack);
-            String encryptMsg = encryption.encryptMessage(acknowledgement);
-            dataOutputStream.writeUTF(encryptMsg);
+            sendAcknowledgement(dataOutputStream, encryption, responseObject);
             return responseObject;
 
         } catch (Exception ex) {
@@ -110,6 +107,13 @@ public class Client implements IClient {
             dataOutputStream.close();
             dataInputStream.close();
         }
+    }
+
+    private void sendAcknowledgement(DataOutputStream dataOutputStream, IEncryption encryption, Response responseObject) throws IOException {
+        Acknowledgement ack = new Acknowledgement(responseObject.getResponseId());
+        String acknowledgement = Utilities.serializer(ack);
+        String encryptMsg = encryption.encryptMessage(acknowledgement);
+        dataOutputStream.writeUTF(encryptMsg);
     }
 
 
