@@ -14,10 +14,9 @@ import de.upb.cs.bibifi.commons.validator.InputPatternChecker;
 import org.apache.commons.io.FileUtils;
 
 import java.net.InetAddress;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.nio.channels.IllegalBlockingModeException;
 import java.util.ArrayList;
@@ -68,42 +67,41 @@ public class Client implements IClient {
         String jsonRequest = Utilities.serializer(transmissionPacket);
         Socket socket = new Socket(ip, port);
         socket.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
-        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+        OutputStream outputStream = socket.getOutputStream();
+        PrintWriter printWriter = new PrintWriter(outputStream, true);
+
+        InputStream inputStream = socket.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
         IEncryption encryption = EncryptionImpl.getInstance();
         Gson gson = new Gson();
         Response responseObject = null;
-        String recvResponse = null;
 
+        String encryptRequest = encryption.encryptMessage(jsonRequest);
+        //Send request on the socket then wait for response
+        printWriter.println(encryptRequest);
 
-        try {
-            String encryptRequest = encryption.encryptMessage(jsonRequest);
-            //Send request on the socket then wait for response
-            dataOutputStream.writeUTF(encryptRequest);
-            recvResponse = dataInputStream.readUTF();
-
-            // decryptMessage the recv response
-            recvResponse = encryption.decryptMessage(recvResponse);
+        String receivedMessage = null;
+        // decryptMessage the recv response
+        if ((receivedMessage = br.readLine()) != null) {
+            receivedMessage = encryption.decryptMessage(receivedMessage);
 
             if (transmissionPacket.getRequestType() == RequestType.CREATE) {
-                responseObject = gson.fromJson(recvResponse, CreationResponse.class);
+                responseObject = gson.fromJson(receivedMessage, CreationResponse.class);
             } else {
-                responseObject = gson.fromJson(recvResponse, Response.class);
+                responseObject = gson.fromJson(receivedMessage, Response.class);
             }
-            
+
             if (!transmissionPacket.getPacketId().equals(responseObject.getRequestId())) {
                 throw new IOException("Invalid response detected");
             }
 
             return responseObject;
-
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            socket.close();
-            dataOutputStream.close();
-            dataInputStream.close();
+        } else {
+            System.exit(63);
         }
+
+        return null;
     }
 
     private void savePin(String pin) throws Exception {
