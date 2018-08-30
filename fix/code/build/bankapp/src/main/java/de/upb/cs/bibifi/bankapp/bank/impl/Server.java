@@ -115,7 +115,7 @@ public class Server implements IServer {
 
             // Check for replay attack
             if (processedPktList.contains(requestPkt.getPacketId())) {
-                System.out.println("protocol error");
+                System.out.println("protocol_error");
                 System.out.flush();
                 return;
             }
