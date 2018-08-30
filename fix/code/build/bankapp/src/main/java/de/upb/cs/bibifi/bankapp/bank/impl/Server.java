@@ -60,10 +60,7 @@ public class Server implements IServer {
             IServer server = new Server(Integer.parseInt(commandLine.getOptionValue("port", String.valueOf(AppConstants.DEFAULT_PORT_NUMBER)))
                     , commandLine.getOptionValue("authfile", AppConstants.DEFAULT_AUTH_FILE_NAME));
             server.start();
-        } catch (IOException e) {
-            System.out.println("protocol error");
-            System.out.flush();
-        } catch (Exception e) {
+        }catch (Exception e) {
             System.exit(255);
         }
     }
@@ -90,12 +87,10 @@ public class Server implements IServer {
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);
                 fail();
-            } catch (IOException ex) {
-                if (sock != null) {
-                    sock.close();
-                }
+            } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
                 System.out.println("protocol_error");
                 System.out.flush();
+                sock.close();
             }
         }
     }
@@ -104,18 +99,27 @@ public class Server implements IServer {
     public void processRequest() throws IOException {
         sock = serverSocket.accept();
         sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
-        DataInputStream inputStream = new DataInputStream(sock.getInputStream());
-        DataOutputStream outputStream = new DataOutputStream(sock.getOutputStream());
 
-        String receiveMessage = inputStream.readUTF();
-        String decryptMsg = encryption.decryptMessage(receiveMessage);
+        InputStream istream = sock.getInputStream();
+        BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+
+        OutputStream out = sock.getOutputStream();
+        PrintWriter print = new PrintWriter(out, true);
+
+        String receiveMessage, decryptMsg = null;
+
+        //Receive msg and decrypt the message
+        if ((receiveMessage = receiveRead.readLine()) != null) {
+            decryptMsg = encryption.decryptMessage(receiveMessage);
+        }
+
         //Take decrypted msg and make pkt
         if (decryptMsg != null) {
             TransmissionPacket requestPkt = Utilities.deserializer(decryptMsg);
 
             // Check for replay attack
             if (processedPktList.contains(requestPkt.getPacketId())) {
-                System.out.println("protocol error");
+                System.out.println("protocol_error");
                 System.out.flush();
                 return;
             }
@@ -131,7 +135,8 @@ public class Server implements IServer {
             Gson gson = new Gson();
             String resJson = gson.toJson(response);
             String encryptResponse = encryption.encryptMessage(resJson);
-            outputStream.writeUTF(encryptResponse);
+            print.println(encryptResponse);
+            print.flush();
             sock.close();
         }
     }
