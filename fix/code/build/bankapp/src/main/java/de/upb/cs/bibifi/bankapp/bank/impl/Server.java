@@ -21,8 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.nio.channels.IllegalBlockingModeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,10 +94,12 @@ public class Server implements IServer {
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);
                 fail();
-            } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
+            } catch (IOException ex) {
+                if (sock != null) {
+                    sock.close();
+                }
                 System.out.println("protocol_error");
                 System.out.flush();
-                sock.close();
             }
         }
     }
