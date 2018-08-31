@@ -1,0 +1,6 @@
+Primary this fix is related to a replay attack. For example for the bug break91 (1128). A replay attack was happening by creating two accounts. Mitm is dropping the send request and was attempting to send the old response to the client. In order to fix this we have added UIID in the transmission packet while sending request from the client to server, Upon response receiving we are validating if it is the response is same for the request which was sent earlier if it is not then its invalid response and atm exists with 63.If replay attack is detected on the bank side then protocol error will be displayed. 
+All these attacks [1128, 1125, 1010, 904, 869, 845, 825, 797, 723, 720, 717, 487, 349, 268, 244] were replay attacks and hence got resolved with only one fix.
+
+
+Note: Earlier we made an attempt to fix this with an older commit#[1aeb32da505265c7ee5496673ab28eb9fefd5c46] but that was rejected by the infastrucute. We modified our fix and refined it now e8e30f34558e4783d555cb3a656fe08dc93ef722 and 1aeb32da505265c7ee5496673ab28eb9fefd5c46 commits have complete changes pertaing to the replay attack.
+
