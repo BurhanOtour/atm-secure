@@ -1,0 +1,4 @@
+This fix aims to resolve the only bug "break-17-integrity-kill-3(421)". Earlier if encryption failed, there was no appropriate catch block for that. Hence ATM and BANK were exiting.
+Now, we added "IOException" catch block, which mitigates this bug.
+
+Commit for this fix: "c199b9239f5068f640b452903cb582d7c9157b7d"
