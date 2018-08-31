@@ -1,0 +1,4 @@
+Primarly this fix is related to a memory overflow. The bug 17_memory_overflow(245) is the only bug related to this fix. Earlier we were using readline() along BufferReader and PrintWriter. 
+Now while reading and writing from the socket, we have changed it to readUTF() and writeUTF(). These methods do not rely on "endline"(\n). Hence memory overflow attack is mitigated.
+
+Commit for this fix: "77a163d127152d6c689b1ab469263b07cb6d495a" 
