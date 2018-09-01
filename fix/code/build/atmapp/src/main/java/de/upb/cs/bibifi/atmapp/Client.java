@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import de.upb.cs.bibifi.atmapp.util.CommandLineHandler;
 import de.upb.cs.bibifi.commons.IEncryption;
 import de.upb.cs.bibifi.commons.constants.AppConstants;
+import de.upb.cs.bibifi.commons.dto.Acknowledgement;
 import de.upb.cs.bibifi.commons.dto.CreationResponse;
 import de.upb.cs.bibifi.commons.dto.Response;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
@@ -63,6 +64,14 @@ public class Client implements IClient {
         }
     }
 
+    private void sendAcknowledgement(DataOutputStream dataOutputStream, Response responseObject) throws Exception {
+        IEncryption encryption = EncryptionImpl.getInstance();
+        Acknowledgement ack = new Acknowledgement(responseObject.getResponseId());
+        String acknowledgement = Utilities.serializer(ack);
+        String encryptMsg = encryption.encryptMessage(acknowledgement);
+        dataOutputStream.writeUTF(encryptMsg);
+    }
+
     private Response sendRequestOnSocket(TransmissionPacket transmissionPacket) throws Exception {
 
         String jsonRequest = Utilities.serializer(transmissionPacket);
@@ -96,6 +105,10 @@ public class Client implements IClient {
             if (!transmissionPacket.getPacketId().equals(responseObject.getRequestId())) {
                 throw new IOException("Invalid response detected");
             }
+
+            //Send Acknowledgement
+            sendAcknowledgement (dataOutputStream, responseObject);
+
             return responseObject;
 
         } catch (Exception ex) {
