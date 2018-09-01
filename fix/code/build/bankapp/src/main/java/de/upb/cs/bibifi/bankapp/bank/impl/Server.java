@@ -11,6 +11,7 @@ import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.validator.Validator;
+import javafx.application.Application;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.*;
 
 
 public class Server implements IServer {
@@ -133,12 +135,35 @@ public class Server implements IServer {
             String resJson = gson.toJson(response);
             String encryptResponse = encryption.encryptMessage(resJson);
             dataOutputStream.writeUTF(encryptResponse);
+            //Wait For Ack
+            waitForAcknowledgement(response.getResponseId(), dataInputStream);
             sock.close();
         }
     }
 
     private void cleanup() throws IOException {
         FileUtils.forceDelete(new File(authFile));
+    }
+
+    private void waitForAcknowledgement(String packetId, DataInputStream inputStream) throws IOException {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        AcknowledgementHandler handler = new AcknowledgementHandler(inputStream, encryption, processedPktList, packetId);
+        try {
+            Future<String> f = service.submit(handler);
+            String recvAckId = f.get(AppConstants.ACK_TIMEOUT, TimeUnit.SECONDS);     // Wait for Ack max for 10 seconds
+            processedPktList.add(recvAckId);
+
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            System.err.println(e);
+            Bank.getBank().undo();
+            System.err.println("Roll back request and shutdown ack handler");
+            System.err.flush();
+
+            System.out.println("protocol_error");
+            System.out.flush();
+        } finally {
+            service.shutdownNow();
+        }
     }
 
 
