@@ -1,0 +1,4 @@
+The auth file content follows a specific structure (JSON Format). And we are using Gson JSON library to serialize/ deserialize between that auth file JSON
+content and its corresponding AuthFile object. If the content of a file provided for atm as an auth file doesn't comply to that format, the Gson library will raise
+JsonSyntaxException which will eventually end up with a crash. Since providing an invalid auth file (like providing card file as an auth file) is considered logically wrong,
+the solution is to catch the exception and exit with error code 255.
