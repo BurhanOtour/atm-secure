@@ -14,6 +14,7 @@ import de.upb.cs.bibifi.commons.validator.InputPatternChecker;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.channels.IllegalBlockingModeException;
 
@@ -34,6 +35,11 @@ public class Client implements IClient {
         String jsonRequest = Utilities.serializer(request);
 
         try {
+            // If remote server is not reachable
+            if(!isRemoteServerReachable()) {
+                System.err.println("Remote server is not reachable");
+                System.exit(63);
+            }
             Socket sock = new Socket(ip, port);
             sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
 
@@ -86,6 +92,10 @@ public class Client implements IClient {
             fail();
         }
         FileUtils.writeStringToFile(file, EncryptionImpl.getInstance().encryptMessage(pin), "UTF-8");
+    }
+
+    private boolean isRemoteServerReachable() throws IOException {
+        return InetAddress.getByName(ip).isReachable(AppConstants.SOCKET_TIMEOUT);
     }
 
     public static void main(String[] args) {
