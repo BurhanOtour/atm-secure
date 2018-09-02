@@ -17,6 +17,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.channels.IllegalBlockingModeException;
+import java.util.ArrayList;
 
 public class Client implements IClient {
 
@@ -75,7 +76,7 @@ public class Client implements IClient {
                     printWriter.flush();
                     sock.close();
                 }
-            } else{
+            } else {
                 System.exit(63);
             }
         } catch (IllegalBlockingModeException | IllegalArgumentException | IOException | InterruptedException ex) {
@@ -99,12 +100,15 @@ public class Client implements IClient {
     }
 
     public static void main(String[] args) {
-        if (!InputPatternChecker.check(args)) {
+
+        String[] argsArray = argsPreProcessing(args);
+
+        if (!InputPatternChecker.check(argsArray)) {
             System.err.println(255);
             System.exit(255);
         }
 
-        CommandLineHandler commandLineHandler = new CommandLineHandler(args);
+        CommandLineHandler commandLineHandler = new CommandLineHandler(argsArray);
         TransmissionPacket packet = commandLineHandler.processCommandLineArguments().getPacket();
         Client client = new Client(commandLineHandler.getCardFileName(), commandLineHandler.getIp(), commandLineHandler.getPort());
         try {
@@ -113,6 +117,23 @@ public class Client implements IClient {
             System.err.println(255);
             System.exit(255);
         }
+    }
+
+    private static String[] argsPreProcessing(String[] args) {
+        ArrayList<String> argsList = new ArrayList<>();
+        int extraArgs = 0;
+        for (String arg : args) {
+            if (arg.startsWith("-g") && arg.length() >= 3) {
+                argsList.add("-g");
+                for (int i = 2; i < arg.length(); i++) {
+                    argsList.add("-" + arg.charAt(i));
+                    extraArgs++;
+                }
+            } else {
+                argsList.add(arg);
+            }
+        }
+        return argsList.toArray(new String[args.length + extraArgs]);
     }
 
     private void fail() {
