@@ -10,6 +10,7 @@ import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.validator.Validator;
+import javafx.util.Pair;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import com.google.gson.Gson;
@@ -19,6 +20,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class Server implements IServer {
@@ -43,7 +47,10 @@ public class Server implements IServer {
         try {
             commandLine = commandLineParser.parse(options, args);
 
-            Validator.applyValidators(commandLine.getOptions());
+            List<Pair<String, String>> optionsList = new ArrayList();
+            Arrays.stream(commandLine.getOptions()).forEach(option -> { optionsList.add(new Pair( option.getOpt(), option.getValue())); });
+            //validate all commandline parameters
+            Validator.applyValidators(optionsList);
 
         } catch (UnrecognizedOptionException ex) {
             System.exit(255);
