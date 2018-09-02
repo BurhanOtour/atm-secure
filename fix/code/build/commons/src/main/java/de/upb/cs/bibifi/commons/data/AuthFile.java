@@ -1,6 +1,7 @@
 package de.upb.cs.bibifi.commons.data;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -30,7 +31,7 @@ public class AuthFile {
         try {
             string = FileUtils.readFileToString(new File(authFilePath), "UTF-8");
             auth = gson.fromJson(string, AuthFile.class);
-        } catch (IOException e) {
+        } catch (IOException | JsonSyntaxException e) {
             System.exit(255);
         }
         return auth;
