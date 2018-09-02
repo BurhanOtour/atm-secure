@@ -1,0 +1,4 @@
+This fix aims to resolve the only bug "442_break8". Earlier if you entered a valid but different ATM didn't exit with error code 63 in time.
+but now with this fix, ATM exists with error code 63 in 10 seconds.
+
+The commit which resolves this issue is: "07c6a72d8097fb044efa7bbf7d3373fb87c2dfa2"
