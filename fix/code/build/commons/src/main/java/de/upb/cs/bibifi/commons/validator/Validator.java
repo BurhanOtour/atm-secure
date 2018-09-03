@@ -1,11 +1,13 @@
 package de.upb.cs.bibifi.commons.validator;
 
 import de.upb.cs.bibifi.commons.constants.SharedConstants;
-import org.apache.commons.cli.Option;
+import javafx.util.Pair;
+
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -169,16 +171,16 @@ public class Validator {
      * @param options
      * @return
      */
-    public static void applyValidators(Option[] options) {
+    public static void applyValidators(List<Pair<String,String>> options) {
 
         Set<String> duplicateOptionsSet = new HashSet<>();
 
-        Arrays.stream(options).forEach(option -> {
+        options.forEach(option -> {
 
-            if (!checkDuplicates(option.getOpt(), duplicateOptionsSet))
+            if (!checkDuplicates(option.getKey(), duplicateOptionsSet))
                 fail();
 
-            switch (option.getOpt()) {
+            switch (option.getKey()) {
                 case SharedConstants.CMD_N:
                     if (!validateNumerals(option.getValue()) || !Validator.validateInitialBalance(option.getValue()))
                         fail();

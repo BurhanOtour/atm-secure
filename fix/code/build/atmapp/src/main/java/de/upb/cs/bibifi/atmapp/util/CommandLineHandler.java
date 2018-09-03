@@ -7,25 +7,25 @@ import de.upb.cs.bibifi.commons.data.AuthFile;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 import de.upb.cs.bibifi.commons.impl.EncryptionImpl;
 import de.upb.cs.bibifi.commons.validator.Validator;
+import javafx.util.Pair;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 public class CommandLineHandler {
 
     private CommandLine commandLine;
 
-    private final String[] args;
+    private String[] args;
 
     private TransmissionPacket packet;
 
     public CommandLineHandler(String[] args) {
         this.args = args;
+        args= replaceHyphen(args);
         if (Arrays.stream(args).anyMatch(x -> x == null || x.isEmpty()))
             Validator.fail();
 
@@ -69,9 +69,17 @@ public class CommandLineHandler {
         try {
 
             commandLine = commandLineParser.parse(options, args);
+            List<Pair<String, String>> optionsList = new ArrayList();
+            Arrays.stream(commandLine.getOptions()).forEach(option -> {
+                String arg= option.getOpt();
+                String val = option.getValue();
+                if(arg.equals(SharedConstants.CMD_A)|| arg.equals(SharedConstants.CMD_C))
+                    val= removePoundSign(val);
 
+                optionsList.add(new Pair(arg, val));
+            });
             //validate all commandline parameters
-            Validator.applyValidators(commandLine.getOptions());
+            Validator.applyValidators(optionsList);
 
             // Retrieve the AuthFile Content
             String key = AuthFile.getAuthFile(commandLine.getOptionValue(SharedConstants.CMD_S, "bank.auth")).getKey();
@@ -166,5 +174,29 @@ public class CommandLineHandler {
         if (cardFileName == null)
             cardFileName = commandLine.getOptionValue(SharedConstants.CMD_A) + ".card";
         return cardFileName;
+    }
+    public static String[] replaceHyphen(String[] args){
+        String lastToken = null;
+        for (int i=0; i<args.length; i++){
+            if (args[i].equals("-a") || args[i].equals("-c")){
+                lastToken = args[i];
+                continue;
+            }
+            if (lastToken!=null && (lastToken.equals("-a") || lastToken.equals("-c"))) {
+                args[i]= args[i].replaceAll("-","#");
+                lastToken=null;
+            }
+            if (args[i].startsWith("-a") || args[i].startsWith("-c")) {
+                String prefix = args[i].substring(0,2);
+                String substring = args[i].substring(2);
+                substring = substring.replaceAll("-","#");
+                args[i] = prefix+substring;
+            }
+        }
+        return args;
+    }
+
+    public static String removePoundSign(String s){
+        return  s.replace('#','-');
     }
 }
