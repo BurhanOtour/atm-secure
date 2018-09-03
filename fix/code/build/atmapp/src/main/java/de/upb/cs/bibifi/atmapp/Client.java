@@ -37,7 +37,7 @@ public class Client implements IClient {
 
         try {
             // If remote server is not reachable
-            if(!isRemoteServerReachable()) {
+            if (!isRemoteServerReachable()) {
                 System.err.println("Remote server is not reachable");
                 System.exit(63);
             }
@@ -125,9 +125,11 @@ public class Client implements IClient {
         for (String arg : args) {
             if (arg.startsWith("-g") && arg.length() >= 3) {
                 argsList.add("-g");
-                for (int i = 2; i < arg.length(); i++) {
-                    argsList.add("-" + arg.charAt(i));
-                    extraArgs++;
+                int nextIndex = 2;
+                argsList.add("-" + arg.charAt(nextIndex));
+                nextIndex++;
+                if (nextIndex < arg.length()) {
+                    argsList.add(arg.substring(nextIndex, arg.length()));
                 }
             } else {
                 argsList.add(arg);
