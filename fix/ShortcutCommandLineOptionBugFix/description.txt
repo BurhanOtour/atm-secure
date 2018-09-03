@@ -1,0 +1,7 @@
+The command line argument handler in our client app is limited to handling more advanced, yet valid, form of options (such as -gc <cardfile>, -ga <account> etc).
+Such options are valid because the -g option doesn't require any argument value.
+So, when such options were provided to our client app, the command line parser will reject it as it considers the input as an unrecognized option.
+Since, an option like "-gc" forms two options together ""-g -c", the idea of the solution is to split, for example the previous option, into two valid options recognized by the command line parser
+that means, "-gc <cardfile>" becomes "-g -c <cardfile>" through a pre-processing step for the command line arguments.
+
+In other words, we pre-process (expand) the args[] array provided for the main method in the client java app so we have an equivalent array recognized by the parser.
