@@ -15,7 +15,10 @@ import javafx.util.Pair;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -105,18 +108,11 @@ public class Server implements IServer {
         sock = serverSocket.accept();
         sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
 
-        InputStream istream = sock.getInputStream();
-        BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+        DataInputStream dataInputStream = new DataInputStream(sock.getInputStream());
+        DataOutputStream dataOutputStream = new DataOutputStream(sock.getOutputStream());
 
-        OutputStream out = sock.getOutputStream();
-        PrintWriter print = new PrintWriter(out, true);
-
-        String receiveMessage, decryptMsg = null;
-
-        //Receive msg and decrypt the message
-        if ((receiveMessage = receiveRead.readLine()) != null) {
-            decryptMsg = encryption.decryptMessage(receiveMessage);
-        }
+        String receiveMessage = dataInputStream.readUTF();
+        String decryptMsg = encryption.decryptMessage(receiveMessage);
 
         //Take decrypted msg and make pkt
         if (decryptMsg != null) {
@@ -140,8 +136,7 @@ public class Server implements IServer {
             Gson gson = new Gson();
             String resJson = gson.toJson(response);
             String encryptResponse = encryption.encryptMessage(resJson);
-            print.println(encryptResponse);
-            print.flush();
+            dataOutputStream.writeUTF(encryptResponse);
             sock.close();
         }
     }

@@ -13,7 +13,10 @@ import de.upb.cs.bibifi.commons.impl.Utilities;
 import de.upb.cs.bibifi.commons.validator.InputPatternChecker;
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.channels.IllegalBlockingModeException;
@@ -64,11 +67,9 @@ public class Client implements IClient {
         String jsonRequest = Utilities.serializer(transmissionPacket);
         Socket socket = new Socket(ip, port);
         socket.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
-        OutputStream outputStream = socket.getOutputStream();
-        PrintWriter printWriter = new PrintWriter(outputStream, true);
 
-        InputStream inputStream = socket.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
         IEncryption encryption = EncryptionImpl.getInstance();
         Gson gson = new Gson();
@@ -76,27 +77,23 @@ public class Client implements IClient {
 
         String encryptRequest = encryption.encryptMessage(jsonRequest);
         //Send request on the socket then wait for response
-        printWriter.println(encryptRequest);
+        dataOutputStream.writeUTF(encryptRequest);
 
-        String receivedMessage = null;
+        //Receive message
+        String receivedMessage = dataInputStream.readUTF();
         // decryptMessage the recv response
-        if ((receivedMessage = br.readLine()) != null) {
-            receivedMessage = encryption.decryptMessage(receivedMessage);
+        receivedMessage = encryption.decryptMessage(receivedMessage);
 
-            if (transmissionPacket.getRequestType() == RequestType.CREATE) {
-                responseObject = gson.fromJson(receivedMessage, CreationResponse.class);
-            } else {
-                responseObject = gson.fromJson(receivedMessage, Response.class);
-            }
-
-            if (!transmissionPacket.getPacketId().equals(responseObject.getRequestId())) {
-                throw new IOException("Invalid response detected");
-            }
-            socket.close();
+        if (transmissionPacket.getRequestType() == RequestType.CREATE) {
+            responseObject = gson.fromJson(receivedMessage, CreationResponse.class);
         } else {
-            System.exit(63);
+            responseObject = gson.fromJson(receivedMessage, Response.class);
         }
 
+        if (!transmissionPacket.getPacketId().equals(responseObject.getRequestId())) {
+            throw new IOException("Invalid response detected");
+        }
+        socket.close();
         return responseObject;
     }
 
