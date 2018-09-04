@@ -78,7 +78,7 @@ public class Client implements IClient {
         String encryptRequest = encryption.encryptMessage(jsonRequest);
         //Send request on the socket then wait for response
         dataOutputStream.writeUTF(encryptRequest);
-
+        
         //Receive message
         String receivedMessage = dataInputStream.readUTF();
         // decryptMessage the recv response
