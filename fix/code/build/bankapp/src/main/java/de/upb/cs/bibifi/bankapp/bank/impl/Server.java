@@ -24,6 +24,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.*;
 
 
 public class Server implements IServer {
@@ -128,21 +129,46 @@ public class Server implements IServer {
             // Add to the processing list to denote that packet is already processed;
             processedPktList.add(requestPkt.getPacketId());
             Response response = processor.executeOperation(requestPkt);
-            if (response.getCode() == 0) {
-                System.out.println(response.getMessage());
-                System.out.flush();
-            }
 
             Gson gson = new Gson();
             String resJson = gson.toJson(response);
             String encryptResponse = encryption.encryptMessage(resJson);
             dataOutputStream.writeUTF(encryptResponse);
+            //Wait For Ack
+            waitForAcknowledgement(response.getResponseId(), dataInputStream);
+
+
+            if (response.getCode() == 0) {
+                System.out.println(response.getMessage());
+                System.out.flush();
+            }
+
             sock.close();
         }
     }
 
     private void cleanup() throws IOException {
         FileUtils.forceDelete(new File(authFile));
+    }
+
+    private void waitForAcknowledgement(String packetId, DataInputStream inputStream) throws IOException {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        AcknowledgementHandler handler = new AcknowledgementHandler(inputStream, encryption, processedPktList, packetId);
+        try {
+            Future<String> f = service.submit(handler);
+            String recvAckId = f.get(AppConstants.ACK_TIMEOUT, TimeUnit.SECONDS);     // Wait for Ack max for 10 seconds
+            processedPktList.add(recvAckId);
+
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            System.err.println(e);
+            Bank.getBank().undo();
+            System.err.println("Roll back request and shutdown ack handler");
+            System.err.flush();
+
+            throw new IOException("Acknowledgement Failure");
+        } finally {
+            service.shutdownNow();
+        }
     }
 
 

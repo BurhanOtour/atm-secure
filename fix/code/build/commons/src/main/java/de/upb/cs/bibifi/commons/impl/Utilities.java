@@ -1,6 +1,7 @@
 package de.upb.cs.bibifi.commons.impl;
 
 import com.google.gson.Gson;
+import de.upb.cs.bibifi.commons.dto.Acknowledgement;
 import de.upb.cs.bibifi.commons.dto.TransmissionPacket;
 
 import java.io.ByteArrayInputStream;
@@ -20,5 +21,10 @@ public class Utilities {
     public static String serializer (TransmissionPacket transmissionPacket){
         Gson gson = new Gson();
         return gson.toJson(transmissionPacket);
+    }
+
+    public static String serializer(Acknowledgement ack) {
+        Gson gson = new Gson();
+        return gson.toJson(ack);
     }
 }
