@@ -1,0 +1,4 @@
+Primarly this fix is related to a replay attack but in these kind of replay attacks server was supposed to reverse the commited transaction because atm side was not able to receive the correct response.For example the bug "test - integrity16 (889)" replay attack was leaving the bank balance in invalid state while atm side was not able to receive correct response for withdraw transaction. So in order to fix this we implemented the acknowledgement mechanism if bank side does not receive ack within 10 seconds then server role backs the transaction.This fix was build on the top of other fix "ExpolitReplayAttackFix" where replay attacks do not require ack so this is extenstion of that solution.
+
+This fix with commit:"fe336465f99a25200fd3cd6305c947a8e9d0a4b2" has fixed the bugs 928,889 and 496.
+
