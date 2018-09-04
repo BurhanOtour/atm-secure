@@ -5,3 +5,11 @@ Since, an option like "-gc" forms two options together ""-g -c", the idea of the
 that means, "-gc <cardfile>" becomes "-g -c <cardfile>" through a pre-processing step for the command line arguments.
 
 In other words, we pre-process (expand) the args[] array provided for the main method in the client java app so we have an equivalent array recognized by the parser.
+
+The original fix was provided in commit:
+----------------------------------------
+e017becd96073cb646648896458c4b793cf3fb24 (Fix input processing bug by making the shortcut option -g[.] recongizable)
+
+The break id: 1091 was resolved in an updated fix with commit:
+--------------------------------------------------------------
+24957a1d7e6c55bf6e6bdbd174f2c45c87a91b60 (cover an extra special case for shortcut_command_line_options_bug to fix bug_id 1091)
