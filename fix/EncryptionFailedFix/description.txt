@@ -1,0 +1,2 @@
+This fix aims to resolve the only bug "421_break-17-integrity-kill-3". Earlier if encryption failed, there was no appropriate catch block for that. Hence ATM was crashing. 
+Now, we have added "IOException" catch block, which mitigates this bug.
