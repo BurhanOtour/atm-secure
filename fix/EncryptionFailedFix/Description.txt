@@ -1,0 +1,4 @@
+This fix aims to resolve the only bug "break-17-integrity-kill-3(421)". Earlier if encryption failed, there was no appropriate catch block for that.BANK were exiting.
+Now, we added "IOException" catch block on the server side, which mitigates this bug.
+
+Commit for this fix: "2cbee31987d717037f97fa217b69da7c3bb7ed75"
