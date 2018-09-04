@@ -32,50 +32,23 @@ public class Client implements IClient {
     }
 
     private void clientRequest(TransmissionPacket request) throws Exception {
-
-        String jsonRequest = Utilities.serializer(request);
-
         try {
             // If remote server is not reachable
             if (!isRemoteServerReachable()) {
                 System.err.println("Remote server is not reachable");
                 System.exit(63);
             }
-            Socket sock = new Socket(ip, port);
-            sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
-
-            OutputStream outputStream = sock.getOutputStream();
-            PrintWriter printWriter = new PrintWriter(outputStream, true);
-            InputStream inputStream = sock.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-            IEncryption encryption = EncryptionImpl.getInstance();
-            String encryptString = encryption.encryptMessage(jsonRequest);
-            printWriter.println(encryptString);
-            printWriter.flush();
-            //Receive Response
-            String receivedMessage;
-            if ((receivedMessage = br.readLine()) != null) {
-                receivedMessage = encryption.decryptMessage(receivedMessage);
-                Gson gson = new Gson();
-                Response responseObject;
+            Response responseObject = sendRequestOnSocket(request);
+            if (responseObject.getCode() == 255 || responseObject.getCode() == 67) {
+                System.exit(255);
+            }
+            if (responseObject.getCode() == 0) {
                 if (request.getRequestType() == RequestType.CREATE) {
-                    responseObject = gson.fromJson(receivedMessage, CreationResponse.class);
-                } else {
-                    responseObject = gson.fromJson(receivedMessage, Response.class);
+                    CreationResponse responseCreationObject = (CreationResponse) responseObject;
+                    savePin(responseCreationObject.getPin());
                 }
-                if (responseObject.getCode() == 255 || responseObject.getCode() == 67) {
-                    System.exit(255);
-                }
-                if (responseObject.getCode() == 0) {
-                    if (request.getRequestType() == RequestType.CREATE) {
-                        CreationResponse responseCreationObject = (CreationResponse) responseObject;
-                        savePin(responseCreationObject.getPin());
-                    }
-                    System.out.println(responseObject.getMessage());
-                    System.out.flush();
-                    printWriter.flush();
-                    sock.close();
-                }
+                System.out.println(responseObject.getMessage());
+                System.out.flush();
             } else {
                 System.exit(63);
             }
@@ -84,6 +57,47 @@ public class Client implements IClient {
             System.err.println(ex.getMessage());
             System.exit(63);
         }
+    }
+
+    private Response sendRequestOnSocket(TransmissionPacket transmissionPacket) throws Exception {
+
+        String jsonRequest = Utilities.serializer(transmissionPacket);
+        Socket socket = new Socket(ip, port);
+        socket.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
+        OutputStream outputStream = socket.getOutputStream();
+        PrintWriter printWriter = new PrintWriter(outputStream, true);
+
+        InputStream inputStream = socket.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        IEncryption encryption = EncryptionImpl.getInstance();
+        Gson gson = new Gson();
+        Response responseObject = null;
+
+        String encryptRequest = encryption.encryptMessage(jsonRequest);
+        //Send request on the socket then wait for response
+        printWriter.println(encryptRequest);
+
+        String receivedMessage = null;
+        // decryptMessage the recv response
+        if ((receivedMessage = br.readLine()) != null) {
+            receivedMessage = encryption.decryptMessage(receivedMessage);
+
+            if (transmissionPacket.getRequestType() == RequestType.CREATE) {
+                responseObject = gson.fromJson(receivedMessage, CreationResponse.class);
+            } else {
+                responseObject = gson.fromJson(receivedMessage, Response.class);
+            }
+
+            if (!transmissionPacket.getPacketId().equals(responseObject.getRequestId())) {
+                throw new IOException("Invalid response detected");
+            }
+            socket.close();
+        } else {
+            System.exit(63);
+        }
+
+        return responseObject;
     }
 
     private void savePin(String pin) throws Exception {

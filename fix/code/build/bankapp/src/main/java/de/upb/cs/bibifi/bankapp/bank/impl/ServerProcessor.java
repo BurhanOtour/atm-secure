@@ -1,6 +1,5 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
-import com.google.gson.Gson;
 import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
 import de.upb.cs.bibifi.commons.dto.CreationResponse;
 import de.upb.cs.bibifi.commons.dto.Response;
@@ -56,7 +55,7 @@ public class ServerProcessor implements IServerProcessor {
         String pin = Bank.getBank().createBalance(accountName, balance);
         Response response;
         if (pin == null) {
-            response = new Response("", 255);
+            response = new Response("", 255, transmissionPacket.getPacketId());
         } else {
             response = buildResponse(RequestType.CREATE, transmissionPacket, pin);
         }
@@ -72,7 +71,7 @@ public class ServerProcessor implements IServerProcessor {
         if (success) {
             response = buildResponse(RequestType.DEPOSIT, transmissionPacket, null);
         } else {
-            response = new Response("", 255);
+            response = new Response("", 255, transmissionPacket.getPacketId());
         }
         return response;
     }
@@ -83,7 +82,7 @@ public class ServerProcessor implements IServerProcessor {
         BigDecimal balance = Bank.getBank().checkBalance(accountName, pin);
         Response response;
         if (balance.compareTo(new BigDecimal("-1")) == 0) {
-            response = new Response("", 255);
+            response = new Response("", 255, transmissionPacket.getPacketId());
         } else {
             response = buildResponse(RequestType.CHECKBALANCE, transmissionPacket, String.valueOf(balance));
         }
@@ -99,7 +98,7 @@ public class ServerProcessor implements IServerProcessor {
         if (success) {
             response = buildResponse(RequestType.WITHDRAW, transmissionPacket, null);
         } else {
-            response = new Response("", 255);
+            response = new Response("", 255, transmissionPacket.getPacketId());
         }
         return response;
     }
@@ -113,25 +112,25 @@ public class ServerProcessor implements IServerProcessor {
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
                 obj.put(KEY_INITIAL_BALANCE, new BigDecimal(transmissionPacket.getProperty(KEY_BALANCE)));
                 message = obj.toString();
-                response = new CreationResponse(message, 0, data);
+                response = new CreationResponse(message, 0, transmissionPacket.getPacketId(), data);
                 break;
             case DEPOSIT:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
                 obj.put(KEY_DEPOSITE, new BigDecimal(transmissionPacket.getProperty(KEY_DEPOSITE)));
                 message = obj.toString();
-                response = new Response(message, 0);
+                response = new Response(message, 0, transmissionPacket.getPacketId());
                 break;
             case WITHDRAW:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
                 obj.put(KEY_WIHTDRAW, new BigDecimal(transmissionPacket.getProperty(KEY_WIHTDRAW)));
                 message = obj.toString();
-                response = new Response(message, 0);
+                response = new Response(message, 0, transmissionPacket.getPacketId());
                 break;
             case CHECKBALANCE:
                 obj.put(KEY_ACCOUNT_NAME, transmissionPacket.getProperty(KEY_ACCOUNT_NAME));
                 obj.put(KEY_BALANCE, new BigDecimal(data));
                 message = obj.toString();
-                response = new Response(message, 0);
+                response = new Response(message, 0, transmissionPacket.getPacketId());
                 break;
         }
         return response;

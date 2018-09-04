@@ -1,5 +1,6 @@
 package de.upb.cs.bibifi.bankapp.bank.impl;
 
+import com.google.gson.Gson;
 import de.upb.cs.bibifi.bankapp.bank.IServer;
 import de.upb.cs.bibifi.bankapp.bank.IServerProcessor;
 import de.upb.cs.bibifi.commons.IEncryption;
@@ -13,7 +14,6 @@ import de.upb.cs.bibifi.commons.validator.Validator;
 import javafx.util.Pair;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
-import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -32,6 +32,8 @@ public class Server implements IServer {
 
     private IEncryption encryption;
     private String authFile;
+    private Socket sock;
+    private ArrayList<String> processedPktList = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -48,7 +50,9 @@ public class Server implements IServer {
             commandLine = commandLineParser.parse(options, args);
 
             List<Pair<String, String>> optionsList = new ArrayList();
-            Arrays.stream(commandLine.getOptions()).forEach(option -> { optionsList.add(new Pair( option.getOpt(), option.getValue())); });
+            Arrays.stream(commandLine.getOptions()).forEach(option -> {
+                optionsList.add(new Pair(option.getOpt(), option.getValue()));
+            });
             //validate all commandline parameters
             Validator.applyValidators(optionsList);
 
@@ -83,52 +87,62 @@ public class Server implements IServer {
 
     @Override
     public void start() throws Exception {
-        PrintWriter print = null;
         while (true) {
-            Socket sock = null;
             try {
-                //Open Socket for accepting request
-                sock = serverSocket.accept();
-                OutputStream out = sock.getOutputStream();
-                print = new PrintWriter(out, true);
-
-                sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
-                InputStream istream = sock.getInputStream();
-                BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-                String receiveMessage, decryptMsg = null;
-
-                //Receive msg and decrypt the message
-                if ((receiveMessage = receiveRead.readLine()) != null) {
-                    decryptMsg = encryption.decryptMessage(receiveMessage);
-                }
-
-                //Take decrypted msg and make pkt
-                if (decryptMsg != null) {
-                    String json = decryptMsg.toString();
-
-                    TransmissionPacket requestPkt = Utilities.deserializer(json);
-                    Response response = processor.executeOperation(requestPkt);
-
-                    if (response.getCode() == 0) {
-                        System.out.println(response.getMessage());
-                        System.out.flush();
-                    }
-
-                    Gson gson = new Gson();
-                    String resJson = gson.toJson(response);
-                    String encryptResponse = encryption.encryptMessage(resJson);
-                    print.println(encryptResponse);
-                    print.flush();
-                }
+                processRequest();
             } catch (IllegalArgumentException ex) {
                 System.err.println(255);
                 fail();
             } catch (SocketTimeoutException | IllegalBlockingModeException ex) {
                 System.out.println("protocol_error");
                 System.out.flush();
-                print.flush();
                 sock.close();
             }
+        }
+    }
+
+    public void processRequest() throws IOException {
+        sock = serverSocket.accept();
+        sock.setSoTimeout(AppConstants.SOCKET_TIMEOUT);
+
+        InputStream istream = sock.getInputStream();
+        BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+
+        OutputStream out = sock.getOutputStream();
+        PrintWriter print = new PrintWriter(out, true);
+
+        String receiveMessage, decryptMsg = null;
+
+        //Receive msg and decrypt the message
+        if ((receiveMessage = receiveRead.readLine()) != null) {
+            decryptMsg = encryption.decryptMessage(receiveMessage);
+        }
+
+        //Take decrypted msg and make pkt
+        if (decryptMsg != null) {
+            TransmissionPacket requestPkt = Utilities.deserializer(decryptMsg);
+
+            // Check for replay attack
+            if (processedPktList.contains(requestPkt.getPacketId())) {
+                System.out.println("protocol_error");
+                System.out.flush();
+                return;
+            }
+
+            // Add to the processing list to denote that packet is already processed;
+            processedPktList.add(requestPkt.getPacketId());
+            Response response = processor.executeOperation(requestPkt);
+            if (response.getCode() == 0) {
+                System.out.println(response.getMessage());
+                System.out.flush();
+            }
+
+            Gson gson = new Gson();
+            String resJson = gson.toJson(response);
+            String encryptResponse = encryption.encryptMessage(resJson);
+            print.println(encryptResponse);
+            print.flush();
+            sock.close();
         }
     }
 
