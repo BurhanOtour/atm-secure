@@ -129,6 +129,10 @@ public class Server implements IServer {
             // Add to the processing list to denote that packet is already processed;
             processedPktList.add(requestPkt.getPacketId());
             Response response = processor.executeOperation(requestPkt);
+            if (response.getCode() == 0) {
+                System.out.println(response.getMessage());
+                System.out.flush();
+            }
 
             Gson gson = new Gson();
             String resJson = gson.toJson(response);
@@ -136,13 +140,6 @@ public class Server implements IServer {
             dataOutputStream.writeUTF(encryptResponse);
             //Wait For Ack
             waitForAcknowledgement(response.getResponseId(), dataInputStream);
-
-
-            if (response.getCode() == 0) {
-                System.out.println(response.getMessage());
-                System.out.flush();
-            }
-
             sock.close();
         }
     }
@@ -160,12 +157,14 @@ public class Server implements IServer {
             processedPktList.add(recvAckId);
 
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            System.err.println(e);
             Bank.getBank().undo();
+            System.err.println(e);
+            System.err.flush();
             System.err.println("Roll back request and shutdown ack handler");
             System.err.flush();
 
-            throw new IOException("Acknowledgement Failure");
+            System.out.println("protocol_error");
+            System.out.flush();
         } finally {
             service.shutdownNow();
         }

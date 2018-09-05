@@ -83,30 +83,36 @@ public class Client implements IClient {
         IEncryption encryption = EncryptionImpl.getInstance();
         Gson gson = new Gson();
         Response responseObject = null;
+        try {
+            String encryptRequest = encryption.encryptMessage(jsonRequest);
+            //Send request on the socket then wait for response
+            dataOutputStream.writeUTF(encryptRequest);
 
-        String encryptRequest = encryption.encryptMessage(jsonRequest);
-        //Send request on the socket then wait for response
-        dataOutputStream.writeUTF(encryptRequest);
+            //Receive message
+            String receivedMessage = dataInputStream.readUTF();
+            // decryptMessage the recv response
+            receivedMessage = encryption.decryptMessage(receivedMessage);
 
-        //Receive message
-        String receivedMessage = dataInputStream.readUTF();
-        // decryptMessage the recv response
-        receivedMessage = encryption.decryptMessage(receivedMessage);
+            if (transmissionPacket.getRequestType() == RequestType.CREATE) {
+                responseObject = gson.fromJson(receivedMessage, CreationResponse.class);
+            } else {
+                responseObject = gson.fromJson(receivedMessage, Response.class);
+            }
 
-        if (transmissionPacket.getRequestType() == RequestType.CREATE) {
-            responseObject = gson.fromJson(receivedMessage, CreationResponse.class);
-        } else {
-            responseObject = gson.fromJson(receivedMessage, Response.class);
+            if (!transmissionPacket.getPacketId().equals(responseObject.getRequestId())) {
+                throw new IOException("Invalid response detected");
+            }
+
+            //Send Acknowledgement
+            sendAcknowledgement(dataOutputStream, responseObject);
+            socket.close();
+            return responseObject;
+
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            socket.close();
         }
-
-        if (!transmissionPacket.getPacketId().equals(responseObject.getRequestId())) {
-            throw new IOException("Invalid response detected");
-        }
-
-        //Send Acknowledgement
-        sendAcknowledgement(dataOutputStream, responseObject);
-        socket.close();
-        return responseObject;
     }
 
     private void savePin(String pin) throws Exception {
