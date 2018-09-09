@@ -1,9 +1,2 @@
-Team 6 assures integrity and validity of any message transferred between atm and bank by hashing (HMAC) the message 
-using a secret and provide the hash as a field in the sent message. Moreover, they rely on a three-way communication to perform one operation i.e. 
-1st send the request by atm, 2nd send status back from the bank, 3rd send ack from atm to bank again.
-
-They do, however, send the always the same successful status message from back to atm for any operation.
-Although the message itself is authentic because of the hashing, MITM can still store the "success status" response message and, later on,
-intercept a "A Failed status" response by the bank and send the success status by MITM instead,
-so an invalid operation is still performing on atm side since the atm always relies on this status message to come from the bank in order 
-to decide whether it performs the operation or not on the client side.
+Team 6 assures integrity and validity of any message transferred between atm and bank by hashing (HMAC) the message using a secret and provide the hash value as a field in any sent message. Moreover, they rely on a three-way communication to perform one operation i.e. 1st they send the initial request to the bank, 2nd they send the operation status back to atm, 3rd send ack from atm to bank again. 
+They do, however, send always the same successful status message from the bank back to the atm for any operation. Although the message itself is authentic because of the hashing, MITM can still store the "success status" response message and, later on, intercept a "A Failed status" response by the bank and send the success status instead, so an invalid operation is still performing on atm side since the atm always relies on this status message to come from the bank in order to decide whether it performs the operation or not on the client side.  
